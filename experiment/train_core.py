@@ -9,9 +9,10 @@ from neon.backends import gen_backend
 from neon.models import Model
 from neon.callbacks.callbacks import Callbacks
 from neon.transforms import Accuracy
+from neon.layers.container import Sequential
 from neon.util.argparser import NeonArgparser, extract_valid_args
 
-from networks import get_core_net
+from networks import get_core_net, save_core
 from data import get_imdb
 
 # parse the command line arguments
@@ -33,7 +34,6 @@ if __name__ == '__main__':
 
     # Build the network
     (encoder, decoder), cost, opt = get_core_net(nout=2)
-    from neon.layers.container import Sequential
     model = Model(layers=Sequential([encoder, decoder, ]))
 
     callbacks = Callbacks(model, eval_set=test_set, **args.callback_args)
@@ -51,6 +51,4 @@ if __name__ == '__main__':
     print 'Test accuracy: ', model.eval(test_set, metric=Accuracy())
 
     # Save models
-    path = './saved_models/'
-    Model(encoder).save_params(path + 'encoder.neon', True)
-    Model(decoder).save_params(path + 'decoder.neon', True)
+    save_core(encoder, decoder)

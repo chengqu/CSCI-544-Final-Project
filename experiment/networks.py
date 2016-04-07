@@ -6,8 +6,8 @@ in the experiements.
 """
 
 from data import VOCAB_SIZE
+from neon.models import Model
 from neon.initializers import GlorotUniform, Uniform
-from neon.layers.container import Sequential
 from neon.optimizers import Adagrad
 from neon.layers import (
     LSTM,
@@ -23,6 +23,9 @@ from neon.transforms import (
     Softmax,
     CrossEntropyMulti,
 )
+
+
+SAVE_PATH = './saved_models/'
 
 
 def get_cost_opt():
@@ -59,7 +62,18 @@ def get_core_net(embedding_size=128, nout=10):
     return (enc, dec), cost, opt
 
 
-def get_title_augmentator(embedding_size=128, path=None):
+def load_core():
+    enc = Model(SAVE_PATH + 'encoder.neon').layers.layers
+    dec = Model(SAVE_PATH + 'decoder.neon').layers.layers
+    return enc, dec
+
+
+def save_core(encoder, decoder):
+    Model(encoder).save_params(SAVE_PATH + 'encoder.neon', True)
+    Model(decoder).save_params(SAVE_PATH + 'decoder.neon', True)
+
+
+def get_title_augmentor(embedding_size=128, path=None):
     """
     Returns the network that will be used to augment the network, to handle
     titles.
