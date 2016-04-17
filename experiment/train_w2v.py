@@ -46,14 +46,9 @@ sentence_length = 128
 batch_size = 32
 gradient_limit = 5
 clip_gradients = True
-args.epochs = 40
 num_epochs = args.epochs
 embedding_update = True
 
-
-
-print num_epochs
-print hidden_size
 
 
 #if __name__ == '__main__':
@@ -105,14 +100,9 @@ X_valid, y_valid = get_paddedXY(
                                 X, y, vocab_size=vocab_size, sentence_length=sentence_length)
 valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
 
-print train_set.shape
-print valid_set.shape
-
 
 print "Initialize model ..."
 
-print embedding_dim
-print vocab_size
 
 
 # initialization
