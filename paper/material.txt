@@ -1,0 +1,6 @@
+Materials.
+
+We used the freely available dataset from https://github.com/ParallelMazen/SaudiNewsNet[1]. The dataset contains a total of 31,030 Arabic newspaper articles, with title, author, date, url and content in each entry. Article objects are reprensented in json format, with UTF-8 encoding. We wrote a script to download the data from github repo, unzip each file, and read them in as json objects. The function can also give out content by key values such as title, author and etc. 
+
+
+[1]Alhagri, Mazen A. Saudi Newspapers Arabic Corpus (SaudiNewsNet). 2015. http://github.com/ParallelMazen/SaudiNewsNet
