@@ -21,11 +21,11 @@ def download_arabic_articles():
     jsonfolder = os.path.join(folder, "json")
     if not os.path.exists(jsonfolder):
         os.makedirs(jsonfolder)
-        
+
     saudi = urllib.URLopener()
     if not os.path.exists(zipfilename):
         saudi.retrieve(url, zipfilename)
-    
+
     file = open(zipfilename, "rb")
     z = zipfile.ZipFile(file)
     z.extractall(folder)
@@ -37,7 +37,7 @@ def download_arabic_articles():
                 zf = zipfile.ZipFile(open(path ,"rb"))
                 zf.extractall(jsonfolder)
                 zf.close()
-    z.close()    
+    z.close()
     return jsonfolder
 
 
@@ -69,9 +69,9 @@ def clean_string_unicode(string):
 	return string.strip()
 
 
-def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv', 
+def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv',
 							vocab_file=None, vocab=None, train_ratio=0.8):
-	
+
 	fname_h5 = filepath + '.h5'
 	if vocab_file is None:
 		fname_vocab = filepath + '.vocab'
@@ -93,18 +93,18 @@ def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv'
 
 		data_valid = h5f.create_dataset('valid', shape=shape, maxshape=maxshape,
 										dtype=h5py.special_dtype(vlen=np.int32), compression='gzip')
-										
+
 		wdata = np.zeros((1, ), dtype=dt)
 		labels = {}
-		label_cnt = 0	
+		label_cnt = 0
 
 		build_vocab = False
 		if vocab is None:
 			vocab = defaultdict(int)
 			build_vocab = True
 		nsamples = 0
-		
-		
+
+
 		# possible keys ['source','url','date_extracted','title','author','content']
 
 		# Crawl through articles
@@ -129,15 +129,15 @@ def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv'
 					wdata['num_words'] = num_words
 					wdata['split'] = split
 					data_text[i] = wdata
-				
+
 				# update the vocab
 				# Vocab has to be built on all keys (all data)
 				if build_vocab:
 					for word in data_words:
 						vocab[word] += 1
-			
+
 			nsamples += 1
-		
+
 		# histogram of class labels, sentence length
 		ratings, counts = np.unique(
 			data_text['y'][:nsamples], return_counts=True)
@@ -194,7 +194,7 @@ def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv'
 		print "vocabulary from dataset is saved into {}". format(fname_vocab)
 		cPickle.dump((vocab, rev_vocab), open(fname_vocab, 'wb'))
 
-	return fname_h5, fname_vocab	
+	return fname_h5, fname_vocab
 
 
 article=load_articles("../SaudiNewsNet")

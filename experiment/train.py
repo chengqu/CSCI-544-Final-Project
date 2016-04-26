@@ -83,9 +83,9 @@ if args.use_w2v:
     vocab, rev_vocab = cPickle.load(open(fname_vocab, 'rb'))
     init_emb, embedding_dim, _ = get_google_word2vec_W(w2v_file, vocab,
                                                        vocab_size=vocab_size, index_from=3)
-    init_emb = Array(val=be.array(init_emb))
+    # init_emb = Array(val=be.array(init_emb))
     print "Done loading the Word2Vec vectors: embedding size - {}".format(embedding_dim)
-    
+
     embedding_update = True
 else:
     init_emb = Uniform(-0.1 / embedding_dim, 0.1 / embedding_dim)
