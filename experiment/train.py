@@ -14,18 +14,7 @@
 # limitations under the License.
 # ----------------------------------------------------------------------------
 """
-  Example that trains LSTM network for sentiment analysis
-  $ python examples/imdb/train.py -e 2 -eval 1 -s imdb.p --vocab_file imdb.vocab
-
-  Get the data from Kaggle:
-
-  https://www.kaggle.com/c/word2vec-nlp-tutorial/data
-
-  If choose to initialize the word embedding layer using Word2Vec, please make sure
-  to get the data GoogleNews-vectors-negative300.bin from:
-
-  https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit?usp=sharing
-
+    Proof of Concept script to load the data in neon format.
 """
 #from prepare import build_data_train
 from neon.backends import gen_backend
@@ -40,7 +29,7 @@ from neon.callbacks.callbacks import Callbacks
 from neon.data.text_preprocessing import get_paddedXY, get_google_word2vec_W
 import h5py
 import cPickle
-from data import load_articles, preprocess_data_train
+from data import load_articles, preprocess_data_train, get_saudinet_data
 
 # parse the command line arguments
 parser = NeonArgparser(__doc__)
@@ -74,7 +63,7 @@ be = gen_backend(**extract_valid_args(args, gen_backend))
 
 # get the preprocessed and tokenized data
 article = load_articles("../SaudiNewsNet")
-fname_h5, fname_vocab = preprocess_data_train(article, 'content')
+fname_h5, fname_vocab = preprocess_data_train(article, 'content', 'labeledTrainData.tsv')
 
 
 # play around with google-news word vectors for init
@@ -101,17 +90,17 @@ ntrain, nvalid, nclass, vocab_size = data.attrs[
 Xy = h5train[:ntrain]
 X = [xy[1:] for xy in Xy]
 y = [xy[0] for xy in Xy]
-X_train, y_train = get_paddedXY(
-    X, y, vocab_size=vocab_size, sentence_length=sentence_length)
+X_train, y_train = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=sentence_length)
 train_set = ArrayIterator(X_train, y_train, nclass=nclass)
 
 # make valid dataset
 Xy = h5valid[:nvalid]
 X = [xy[1:] for xy in Xy]
 y = [xy[0] for xy in Xy]
-X_valid, y_valid = get_paddedXY(
-    X, y, vocab_size=vocab_size, sentence_length=sentence_length)
+X_valid, y_valid = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=sentence_length)
 valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
+
+train_set, valid_set, _ = get_saudinet_data(args)
 
 
 # initialization
@@ -120,8 +109,7 @@ init_glorot = GlorotUniform()
 
 # define layers
 layers = [
-    LookupTable(vocab_size=vocab_size, embedding_dim=embedding_dim, init=init_emb,
-                pad_idx=0, update=embedding_update),
+    LookupTable(vocab_size=vocab_size, embedding_dim=embedding_dim, init=init_emb, pad_idx=0, update=embedding_update),
     LSTM(hidden_size, init_glorot, activation=Tanh(), gate_activation=Logistic(),
          reset_cells=True),
     RecurrentSum(),

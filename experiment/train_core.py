@@ -13,14 +13,14 @@ from neon.layers.container import Sequential
 from neon.util.argparser import NeonArgparser, extract_valid_args
 
 from networks import get_core_net, save_core
-from data import get_imdb
+from data import get_imdb, get_saudinet_data
 
 # parse the command line arguments
 parser = NeonArgparser(__doc__)
 args = parser.parse_args(gen_be=False)
 
 # hyperparameters from the reference
-args.batch_size = 128
+# args.batch_size = 32
 args.backend = 'gpu'
 
 
@@ -30,10 +30,11 @@ if __name__ == '__main__':
 
     # Load the dataset
     # TODO: Change IMDB with Arabic articles
-    train_set, test_set = get_imdb(args)
+    # train_set, test_set, nout = get_imdb(args)
+    train_set, test_set, nout = get_saudinet_data(args)
 
     # Build the network
-    (encoder, decoder), cost, opt = get_core_net(nout=2)
+    (encoder, decoder), cost, opt = get_core_net(nout=nout)
     model = Model(layers=Sequential([encoder, decoder, ]))
 
     callbacks = Callbacks(model, eval_set=test_set, **args.callback_args)

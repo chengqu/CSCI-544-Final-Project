@@ -47,9 +47,8 @@ def get_core_net(embedding_size=128, nout=10):
     glorot = GlorotUniform()
 
     enc = [
-        LookupTable(vocab_size=VOCAB_SIZE, embedding_dim=128, init=uni),
-        LSTM(embedding_size, glorot, activation=Tanh(),
-             gate_activation=Logistic(), reset_cells=True),
+        LookupTable(vocab_size=VOCAB_SIZE, embedding_dim=embedding_dim, init=uni, pad_idx=0, update=True),
+        LSTM(embedding_size, glorot, activation=Tanh(), gate_activation=Logistic(), reset_cells=True),
         RecurrentSum(),
     ]
 
