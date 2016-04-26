@@ -1,0 +1,193 @@
+\author{Group 40: Arnold, Gurunat, Huang, \& Qu}
+\title{Modular Deep Encoder-Decoders}
+\date{\today}
+\documentclass[12pt]{article}
+
+\input{\string~/tex_templates/core}
+
+% Custom Title
+
+%\def\maketitle{
+    %\centering
+    %\par\textbf{\LARGE\@title}
+    %\par\hfill
+    %\par{\@author, \@date}
+    %\par\hfill
+    %\par\hfill
+    %\rule{\textwidth}{3pt}
+%}
+
+\def\maketitle{
+    \begin{centering}
+    \par\rule{\textwidth}{2pt}
+    \par\hfill
+    \par\textbf{\LARGE\@title}
+    \par\hfill
+    \par{\textit{\@author}}
+    \par\hfill
+    \par{\@date}
+    \par\rule{\textwidth}{2pt}
+    \end{centering}
+}
+
+\begin{document}
+\thispagestyle{empty}
+\maketitle
+\hfill
+\begin{abstract}
+In this short paper we propose an approach to transfer learning using rich
+vector embeddings. The suggested technique can be applied to any supervised
+task, and it handles multiple sources and changing sources of data without the
+need for retraining. To verify our ideas, we apply our ideas to the task of
+text-classification.
+\end{abstract}
+
+\section{Introduction}\label{introduction}
+
+Our goal is to generate rich vector embeddings from articles to classify
+them into predefined categories. Then, we want to extend our model with
+an additional source of data: the title of the videos. To handle this
+new knowledge source without retraining our previous model, we suggest
+to generate a new embedding that will be used to modify the original
+one. This combined embedding will then be used for the classification
+task.
+
+More formally, we want to jointly learn a set of \emph{encoder}
+functions $\{E_i\}_0^N$ mapping samples $x \sim \chi_i$ from a set of
+data distributions $\{\chi_i\}_0^N$ to a fixed-sized vector embedding
+$V$.
+
+\[ \forall i \in [0; N]: E_i(x): \chi_i \rightarrow V_i \in \Re^M\]
+
+\[V = \sum_i^N V_i\]
+
+The embedding $V$ is then fed into a decoder function $D$ which in the
+case of classification learns a mapping from the vector space of $V$ to
+the label space $L$.
+
+\[ D(v): \Re^M \rightarrow L \in \Re^D\]
+
+Finally, we want to extend the set of encoders by learning a new encoder
+$E_{N+1}$ which handles samples from a different dataset $\chi_{N+1}$,
+without retraining our trained decoders and encoders.
+
+\[ E_{N+1}(x): \chi_{N+1} \rightarrow V_{N+1} \in \Re^M\]
+
+Although we could have used any kind of mapping, we chose to use deep
+learning algorithms, as they easily learn hierarchical representations
+and have been known to highly outperform other statistical techniques on
+natural language tasks. Learning embeddings has been previously done by
+\href{References}{{[}1{]}}, although our proposed contribution is
+slightly different. \href{References}{{[}1{]}} used deep autoencoders to
+obtain a better initialization of the parameters of their model. Our
+approach instead is much closer in spirit to the work of Sutskever
+\href{References}{{[}3{]}} and Vinyals \href{References}{{[}4{]}}. They
+both use encoders on a sequence of data to generate a
+\emph{thought-vector} which will then be decoded in the desired terget
+sequence. In some sense, our proposal adds the transfer learning
+component to their contribution. This approach is also similar to the
+work of Karpathy \& al \href{References}{{[}5{]}} where they mapped
+images to their captions with embeddings.
+
+\section{Method}\label{method}
+
+\subsection{Materials}\label{materials}
+
+We will use the freely avaiable dataset from
+\url{https://github.com/ParallelMazen/SaudiNewsNet} and extract the
+titles and articles content. Since the dataset initial purpose is not
+the classification, we will have to slightly rework it to fit our
+purpose.
+
+We will use the neon python library for training deep networks. In the
+case where the training phase would become too expensive, we will also
+rely on the mpi4py library.
+
+\subsection{Procedure}\label{procedure}
+
+The procedure is quite straight-forward. While part of the team will
+work on building our tailored dataset, the other half will work on the
+model definition and training procedure. Coordination at the beginning
+of the work will be curcial. In particular, we plan on feeding the text
+data as a sequence of one-hot character encodings.
+
+Once every pre-requisite is available, we will train the first encoder
+$E_1$ (implemented as a recurrent neural network) to build the embedding
+$V_1$. Since we will only be dealing with a relatively simple
+classification task, our decoder $D_1$ will simply be a fully connected
+multi-layer perceptron. They will be jointly trained end-to-end by
+propagating the gradients through the embedding from $D_1$ to $E_1$.
+
+The second training step will be to train the second encoder $E_2$.
+Again, we also perform training end-to-end, but specifically do not
+propagate the gradients through $E_1$. We hope to avoid optimizing the
+parameters of $D_1$, but this might not be practically doable.
+
+\subsection{Evaluation}\label{evaluation}
+
+The final evaluation scheme is mostly to be determined depending on our
+obtained outcomes. Obviously, we want to compare the new model with the
+the the jointly trained one, as well as a classification baseline.
+
+\section{Participants \& Labor
+Division}\label{participants-labor-division}
+
+The participants in alphabetical order:
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Seb Arnold - 9013085897 - arnolds@usc.edu
+\item
+  Prashanth Gurunath Shivakumar - 2251924199 - pgurunat@usc.edu
+\item
+  Qiangui Huang - 9532576000 - qianguih@usc.edu
+\item
+  Cheng Qu - 2385279985 - chengqu@usc.edu
+\end{itemize}
+
+Instead of having a fixed division of the labor, we assigned one
+responsible to each task. The responsible acts as a project lead on the
+designed task and other team members can contrbibute to the task as
+required.
+
+\begin{itemize}
+\item
+  Dataset: Cheng
+\item
+  Model Training: Quiangui
+\item
+  Knowledge Transfer: Seb
+\item
+  Report Writing: Prashanth
+\end{itemize}
+
+\section{References}\label{references}
+
+Part of the relevant literature review. More literature was involved for
+the deep learning part.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Supervised Representation Learning: Transfer Learning with Deep
+  Autoencoders, Zhuang \& al,
+  http://ijcai.org/Proceedings/15/Papers/578.pdf
+\item
+  Transfer Learning via Dimensionality Reduction, Pan \& al,
+
+  https://www.cse.ust.hk/\textasciitilde{}jamesk/papers/aaai08.pdf
+\item
+  Sequence to Sequence Learning with Neural Networks, Sutskever \& al,
+
+  http://arxiv.org/abs/1409.3215
+\item
+  Grammar as a Foreign Language, Vinyals \& al,
+  http://arxiv.org/abs/1412.7449
+\item
+  Deep Fragment Embeddings for Bidirectional Image Sentence Mapping,
+  Karpathy \& al, https://cs.stanford.edu/people/karpathy/nips2014.pdf
+\end{enumerate}
+
+%\end{multicols}
+\end{document}
