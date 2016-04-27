@@ -3,7 +3,7 @@
 
 # Instructions
 
-To run the whole experiment do:
+To run the whole experiment do: (approx. 20min on a recent NVIDIA GPU)
 
 ```
 make all
@@ -11,7 +11,7 @@ make all
 
 It should download the dataset, unzip, train and serialize the core components, and finally train and benchmark the augmented, multimodal model.
 
-A typical output should be
+A typical output should be: 
 
 ```
 

@@ -14,7 +14,7 @@ from neon.transforms import Accuracy
 from neon.util.argparser import NeonArgparser, extract_valid_args
 
 from networks import load_core, get_title_augmentor
-from data import get_imdb
+from data import get_imdb, get_saudinet_data
 
 # parse the command line arguments
 parser = NeonArgparser(__doc__)
@@ -30,8 +30,8 @@ if __name__ == '__main__':
     be = gen_backend(**extract_valid_args(args, gen_backend))
 
     # Load the dataset
-    # TODO: Change IMDB with Arabic articles
-    train_set, test_set = get_imdb(args)
+    train_content, test_content = get_saudinet_data(args, modality='content')
+    train_title, test_title = get_saudinet_data(args, modality='title')
 
     # Build the network
     encoder, decoder = load_core()
