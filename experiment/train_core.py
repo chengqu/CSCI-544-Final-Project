@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     # Load the dataset
     # train_set, test_set, nout = get_imdb(args)
-    (X_train, y_train), (X_test, y_test), nout, vocab_size = get_saudinet_data(args)
+    (X_train, y_train), (X_test, y_test), nout, vocab_size = get_saudinet_data(args, modality='content')
     train_set = ArrayIterator(X_train, y_train, nout)
     test_set = ArrayIterator(X_test, y_test, nout)
 
