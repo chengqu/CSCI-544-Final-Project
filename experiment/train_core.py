@@ -6,6 +6,7 @@ the decoder.
 """
 
 from neon.backends import gen_backend
+from neon.data import ArrayIterator
 from neon.models import Model
 from neon.callbacks.callbacks import Callbacks
 from neon.transforms import Accuracy
@@ -20,7 +21,7 @@ parser = NeonArgparser(__doc__)
 args = parser.parse_args(gen_be=False)
 
 # hyperparameters from the reference
-args.batch_size = 32
+args.batch_size = 128
 args.backend = 'gpu'
 
 
@@ -30,11 +31,12 @@ if __name__ == '__main__':
 
     # Load the dataset
     # train_set, test_set, nout = get_imdb(args)
-    train_set, test_set, nout, vocab_size = get_saudinet_data(args)
+    (X_train, y_train), (X_test, y_test), nout, vocab_size = get_saudinet_data(args)
+    train_set = ArrayIterator(X_train, y_train, nout)
+    test_set = ArrayIterator(X_test, y_test, nout)
 
     # Build the network
     (encoder, decoder), cost, opt = get_core_net(nout=nout, vocab_size=vocab_size)
-    # model = Model(layers=encoder)
     model = Model(layers=Sequential([encoder, decoder, ]))
 
     callbacks = Callbacks(model, eval_set=test_set, **args.callback_args)

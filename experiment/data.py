@@ -26,7 +26,7 @@ def get_saudinet_data(args, modality='content'):
     """ Returns a train and validation dataset from SaudiNewsNet. """
     # get the preprocessed and tokenized data
     article = load_articles("./SaudiNewsNet")
-    fname_h5, fname_vocab = preprocess_data_train(article, 'content', './labeledTrainData.tsv')
+    fname_h5, fname_vocab = preprocess_data_train(article, modality, './labeledTrainData.tsv')
 
     h5f = h5py.File(fname_h5, 'r')
     data, h5train, h5valid = h5f['data'], h5f['train'], h5f['valid']
@@ -38,16 +38,16 @@ def get_saudinet_data(args, modality='content'):
     X = [xy[1:] for xy in Xy]
     y = [xy[0] for xy in Xy]
     X_train, y_train = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=SENTENCE_LENGTH)
-    train_set = ArrayIterator(X_train, y_train, nclass=nclass)
+    # train_set = ArrayIterator(X_train, y_train, nclass=nclass)
 
     # make valid dataset
     Xy = h5valid[:nvalid]
     X = [xy[1:] for xy in Xy]
     y = [xy[0] for xy in Xy]
     X_valid, y_valid = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=SENTENCE_LENGTH)
-    valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
+    # valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
 
-    return train_set, valid_set, nclass, vocab_size
+    return (X_train, y_train), (X_valid, y_valid), nclass, vocab_size
 
 
 def get_imdb(args):

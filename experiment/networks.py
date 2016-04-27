@@ -10,6 +10,7 @@ from neon.initializers import GlorotUniform, Uniform
 from neon.optimizers import Adagrad
 from neon.layers import (
     LSTM,
+    Linear,
     Affine,
     LookupTable,
     RecurrentSum,
@@ -52,7 +53,7 @@ def get_core_net(embedding_size=128, vocab_size=20000, nout=10):
     ]
 
     dec = [
-        Dropout(keep=0.5),
+        Dropout(keep=0.7),
         Affine(nout, glorot, bias=glorot, activation=Softmax())
     ]
 
@@ -60,10 +61,11 @@ def get_core_net(embedding_size=128, vocab_size=20000, nout=10):
     return (enc, dec), cost, opt
 
 
-def load_core():
+def load_core(embedding_size=128):
+    uni = Uniform(low=-0.1/embedding_size, high=0.1/embedding_size)
     enc = Model(SAVE_PATH + 'encoder.neon').layers.layers
     dec = Model(SAVE_PATH + 'decoder.neon').layers.layers
-    return enc, dec
+    return enc, [Linear(embedding_size, uni), ] + dec
 
 
 def save_core(encoder, decoder):
@@ -71,7 +73,7 @@ def save_core(encoder, decoder):
     Model(decoder).save_params(SAVE_PATH + 'decoder.neon', True)
 
 
-def get_title_augmentor(embedding_size=128, path=None):
+def get_title_augmentor(vocab_size=20000, embedding_size=128, path=None):
     """
     Returns the network that will be used to augment the network, to handle
     titles.
@@ -83,7 +85,7 @@ def get_title_augmentor(embedding_size=128, path=None):
     glorot = GlorotUniform()
 
     aug = [
-        LookupTable(vocab_size=VOCAB_SIZE, embedding_dim=128, init=uni),
+        LookupTable(vocab_size=vocab_size, embedding_dim=128, init=uni),
         LSTM(embedding_size, glorot, activation=Tanh(),
              gate_activation=Logistic(), reset_cells=True),
         RecurrentSum(),

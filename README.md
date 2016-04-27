@@ -3,7 +3,7 @@
 
 # Instructions
 
-To run the whole experiment do: (approx. 20min on a recent NVIDIA GPU)
+To run the whole experiment run: (approx. 20min on a recent NVIDIA GPU)
 
 ```
 make all
