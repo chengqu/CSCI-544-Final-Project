@@ -1,0 +1,95 @@
+% Packages import
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{fancyhdr}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xpatch}
+\usepackage{titling}
+\usepackage{geometry}
+\usepackage{multicol}
+\usepackage{lipsum}
+\usepackage{array}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage[noend]{algpseudocode}
+\usepackage{listing}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{supertabular}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[export]{adjustbox}
+\usepackage{breakcites}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Defining variables
+\makeatletter
+\let\Title\@title
+\let\Author\@author
+\let\Date\@date
+\makeatother
+
+% Margins
+%\geometry{letterpaper, portrait, margin=1.00in}
+%\geometry{legalpaper, portrait, margin=1.00in}
+\geometry{a4paper, portrait, margin=1.00in, bottom=1.25in, top=1.25in}
+ 
+% Headers and Footers
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\Title}
+\lhead{\Date}
+\rfoot{Page \thepage}
+\renewcommand{\headrulewidth}{2pt}
+\renewcommand{\footrulewidth}{1pt}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+% Section Customization
+\renewcommand\thesection{{\Roman{section}}}
+\renewcommand\thesubsection{}{\Roman{subsection}}
+\renewcommand\thesubsubsection{}{\Roman{subsubsection}}
+
+% Theorems and Tipps
+\makeatletter
+\xpatchcmd{\@thm}{\thm@headpunct{.}}{\thm@headpunct{}}{}{}
+\newtheorem{theorem}{\underline{Theorem}}[section]
+\newtheorem{definition}{\underline{Definition}}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{remark}
+\newtheorem*{note}{Note:}
+\theoremstyle{remark}
+\newtheorem*{tip}{Tip:}
+
+% Limit Image Width
+\let\oldincludegraphics\includegraphics
+\renewcommand{\includegraphics}[2][]{%
+  \oldincludegraphics[#1,max width=\linewidth]{#2}}
+
+% Code highlighting
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+\newenvironment{Shaded}{}{}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.00,1.00}{{#1}}}
+\newcommand{\DataTypeTok}[1]{{#1}}
+\newcommand{\DecValTok}[1]{{#1}}
+\newcommand{\BaseNTok}[1]{{#1}}
+\newcommand{\FloatTok}[1]{{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.00,0.50,0.50}{{#1}}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.00,0.50,0.50}{{#1}}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{1.00,0.25,0.00}{{#1}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{{#1}}}
+\newcommand{\FunctionTok}[1]{{#1}}
+\newcommand{\RegionMarkerTok}[1]{{#1}}
+\newcommand{\ErrorTok}[1]{\textbf{{#1}}}
+\newcommand{\NormalTok}[1]{{#1}}
+\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small\ttfamily}}{}
