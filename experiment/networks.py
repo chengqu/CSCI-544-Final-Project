@@ -53,7 +53,7 @@ def get_core_net(embedding_size=128, vocab_size=20000, nout=10):
     ]
 
     dec = [
-        Dropout(keep=0.7),
+        Dropout(keep=0.5),
         Affine(nout, glorot, bias=glorot, activation=Softmax())
     ]
 

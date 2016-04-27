@@ -54,7 +54,7 @@ def get_imdb(args):
     """DUmmy dataset for dev."""
     path = load_imdb(path=args.data_dir)
     (X_train, y_train), (X_test, y_test), nclass = pad_data(
-        path, vocab_size=VOCAB_SIZE, sentence_length=SENTENCE_LENGTH)
+        path, vocab_size=20000, sentence_length=SENTENCE_LENGTH)
     train_set = ArrayIterator(X_train, y_train, nclass=2)
     test_set = ArrayIterator(X_test, y_test, nclass=2)
     return (train_set, test_set, 2, 20000)
@@ -67,7 +67,7 @@ downloads the SaudiNewsNet and unzip dataset and returns the folder path
 
 def download_arabic_articles():
     url = "https://codeload.github.com/ParallelMazen/SaudiNewsNet/zip/master"
-    zipfilename = "../SaudiNewsNet.zip"
+    zipfilename = "./SaudiNewsNet.zip"
     folder = zipfilename.replace(".zip", "")
     jsonfolder = os.path.join(folder, "json")
     if not os.path.exists(jsonfolder):
@@ -80,7 +80,7 @@ def download_arabic_articles():
     file = open(zipfilename, "rb")
     z = zipfile.ZipFile(file)
     z.extractall(folder)
-    for subdir, dirs, files in os.walk("../SaudiNewsNet"):
+    for subdir, dirs, files in os.walk("./SaudiNewsNet"):
         for f in files:
             path = os.path.join(subdir, f)
             if ".zip" in path:
@@ -247,5 +247,6 @@ def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv'
 
 
 if __name__ == '__main__':
-    article = load_articles("../SaudiNewsNet")
+    download_arabic_articles()
+    article = load_articles("./SaudiNewsNet")
     fname_h5, fname_vocab = preprocess_data_train(article, 'content')

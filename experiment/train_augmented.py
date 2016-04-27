@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # Load the dataset
     (X_train_content, y_train_content), (X_test_content, y_test_content), nout, vocab_size = get_saudinet_data(args, modality='content')
-    (X_train_title, y_train_title), (X_test_title, y_test_title), nout, vocab_size = get_saudinet_data(args, modality='title')
+    (X_train_title, y_train_title), (X_test_title, y_test_title), nout, vocab_size = get_saudinet_data(args, modality='authors')
     train_set = ArrayIterator([X_train_content, X_train_title], y_train_content, nout)
     test_set = ArrayIterator([X_test_content, X_test_title], y_test_content, nout)
 
