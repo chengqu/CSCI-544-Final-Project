@@ -20,7 +20,7 @@ parser = NeonArgparser(__doc__)
 args = parser.parse_args(gen_be=False)
 
 # hyperparameters from the reference
-# args.batch_size = 32
+args.batch_size = 32
 args.backend = 'gpu'
 
 
@@ -29,12 +29,12 @@ if __name__ == '__main__':
     be = gen_backend(**extract_valid_args(args, gen_backend))
 
     # Load the dataset
-    # TODO: Change IMDB with Arabic articles
     # train_set, test_set, nout = get_imdb(args)
-    train_set, test_set, nout = get_saudinet_data(args)
+    train_set, test_set, nout, vocab_size = get_saudinet_data(args)
 
     # Build the network
-    (encoder, decoder), cost, opt = get_core_net(nout=nout)
+    (encoder, decoder), cost, opt = get_core_net(nout=nout, vocab_size=vocab_size)
+    # model = Model(layers=encoder)
     model = Model(layers=Sequential([encoder, decoder, ]))
 
     callbacks = Callbacks(model, eval_set=test_set, **args.callback_args)

@@ -5,7 +5,6 @@ Defines the network architecture, hyper-params, optimizer and cost to be used
 in the experiements.
 """
 
-from data import VOCAB_SIZE
 from neon.models import Model
 from neon.initializers import GlorotUniform, Uniform
 from neon.optimizers import Adagrad
@@ -35,7 +34,7 @@ def get_cost_opt():
     return cost, opt
 
 
-def get_core_net(embedding_size=128, nout=10):
+def get_core_net(embedding_size=128, vocab_size=20000, nout=10):
     """
     Returns a tuple containing the original encoder and decoder networks.
     embedd_size: size of the output of the encoder
@@ -47,7 +46,7 @@ def get_core_net(embedding_size=128, nout=10):
     glorot = GlorotUniform()
 
     enc = [
-        LookupTable(vocab_size=VOCAB_SIZE, embedding_dim=embedding_dim, init=uni, pad_idx=0, update=True),
+        LookupTable(vocab_size=vocab_size, embedding_dim=embedding_dim, init=uni, pad_idx=0, update=True),
         LSTM(embedding_size, glorot, activation=Tanh(), gate_activation=Logistic(), reset_cells=True),
         RecurrentSum(),
     ]

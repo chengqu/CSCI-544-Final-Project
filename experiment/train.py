@@ -29,7 +29,7 @@ from neon.callbacks.callbacks import Callbacks
 from neon.data.text_preprocessing import get_paddedXY, get_google_word2vec_W
 import h5py
 import cPickle
-from data import load_articles, preprocess_data_train, get_saudinet_data
+from data import load_articles, preprocess_data_train, get_saudinet_data, get_imdb
 
 # parse the command line arguments
 parser = NeonArgparser(__doc__)
@@ -82,30 +82,29 @@ else:
 
 h5f = h5py.File(fname_h5, 'r')
 data, h5train, h5valid = h5f['data'], h5f['train'], h5f['valid']
-ntrain, nvalid, nclass, vocab_size = data.attrs[
-    'ntrain'], data.attrs['nvalid'], data.attrs['nclass'], data.attrs['vocab_size']
+ntrain, nvalid, nclass, vocab_size = data.attrs['ntrain'], data.attrs['nvalid'], data.attrs['nclass'], data.attrs['vocab_size']
 
 
-# make train dataset
-Xy = h5train[:ntrain]
-X = [xy[1:] for xy in Xy]
-y = [xy[0] for xy in Xy]
-X_train, y_train = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=sentence_length)
-train_set = ArrayIterator(X_train, y_train, nclass=nclass)
+# # make train dataset
+# Xy = h5train[:ntrain]
+# X = [xy[1:] for xy in Xy]
+# y = [xy[0] for xy in Xy]
+# X_train, y_train = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=sentence_length)
+# train_set = ArrayIterator(X_train, y_train, nclass=nclass)
 
-# make valid dataset
-Xy = h5valid[:nvalid]
-X = [xy[1:] for xy in Xy]
-y = [xy[0] for xy in Xy]
-X_valid, y_valid = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=sentence_length)
-valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
+# # make valid dataset
+# Xy = h5valid[:nvalid]
+# X = [xy[1:] for xy in Xy]
+# y = [xy[0] for xy in Xy]
+# X_valid, y_valid = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=sentence_length)
+# valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
 
-train_set, valid_set, _ = get_saudinet_data(args)
+train_set, valid_set, nout = get_saudinet_data(args)
 
 
 # initialization
 init_glorot = GlorotUniform()
-
+init_emb = Uniform(-0.1 / embedding_dim, 0.1 / embedding_dim)
 
 # define layers
 layers = [
@@ -114,7 +113,7 @@ layers = [
          reset_cells=True),
     RecurrentSum(),
     Dropout(keep=0.5),
-    Affine(nclass, init_glorot, bias=init_glorot, activation=Softmax())
+    Affine(nout, init_glorot, bias=init_glorot, activation=Softmax())
 ]
 
 # set the cost, metrics, optimizer

@@ -19,15 +19,14 @@ from neon.data import ArrayIterator
 from neon.data.dataloaders import load_imdb
 from neon.data.text_preprocessing import pad_data
 
-VOCAB_SIZE = 20000
 SENTENCE_LENGTH = 128
 
 
-def get_saudinet_data(args):
+def get_saudinet_data(args, modality='content'):
     """ Returns a train and validation dataset from SaudiNewsNet. """
     # get the preprocessed and tokenized data
     article = load_articles("./SaudiNewsNet")
-    fname_h5, fname_vocab = preprocess_data_train(article, 'content', './experiments/labeledTrainData.tsv')
+    fname_h5, fname_vocab = preprocess_data_train(article, 'content', './labeledTrainData.tsv')
 
     h5f = h5py.File(fname_h5, 'r')
     data, h5train, h5valid = h5f['data'], h5f['train'], h5f['valid']
@@ -45,11 +44,10 @@ def get_saudinet_data(args):
     Xy = h5valid[:nvalid]
     X = [xy[1:] for xy in Xy]
     y = [xy[0] for xy in Xy]
-    X_valid, y_valid = get_paddedXY(
-        X, y, vocab_size=vocab_size, sentence_length=SENTENCE_LENGTH)
+    X_valid, y_valid = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=SENTENCE_LENGTH)
     valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
 
-    return train_set, valid_set, nclass
+    return train_set, valid_set, nclass, vocab_size
 
 
 def get_imdb(args):
@@ -59,7 +57,7 @@ def get_imdb(args):
         path, vocab_size=VOCAB_SIZE, sentence_length=SENTENCE_LENGTH)
     train_set = ArrayIterator(X_train, y_train, nclass=2)
     test_set = ArrayIterator(X_test, y_test, nclass=2)
-    return (train_set, test_set, 2)
+    return (train_set, test_set, 2, 20000)
 
 
 """
