@@ -65,7 +65,8 @@ def load_core(embedding_size=128):
     uni = Uniform(low=-0.1/embedding_size, high=0.1/embedding_size)
     enc = Model(SAVE_PATH + 'encoder.neon').layers.layers
     dec = Model(SAVE_PATH + 'decoder.neon').layers.layers
-    return enc, [Linear(embedding_size, uni), ] + dec
+    return enc, dec
+    # return enc, [Linear(embedding_size, uni), ] + dec
 
 
 def save_core(encoder, decoder):
@@ -80,8 +81,7 @@ def get_title_augmentor(vocab_size=20000, embedding_size=128, path=None):
     embedd_size: size of the embedding
     path: filepath from which to load the model's weights
     """
-    embedding_dim = 128
-    uni = Uniform(low=-0.1/embedding_dim, high=0.1/embedding_dim)
+    uni = Uniform(low=1.0, high=1.0)
     glorot = GlorotUniform()
 
     aug = [

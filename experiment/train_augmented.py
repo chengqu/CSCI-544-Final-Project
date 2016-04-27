@@ -58,12 +58,11 @@ if __name__ == '__main__':
     (X_train_content, y_train_content), (X_test_content, y_test_content), nout, vocab_size = get_saudinet_data(args, modality='content')
     (X_train_title, y_train_title), (X_test_title, y_test_title), nout, vocab_size = get_saudinet_data(args, modality='title')
     train_set = ArrayIterator([X_train_content, X_train_title], y_train_content, nout)
-    test_set = ArrayIterator([X_test_content, X_test_title], y_train_content, nout)
+    test_set = ArrayIterator([X_test_content, X_test_title], y_test_content, nout)
 
     # Build the network
     encoder, decoder = load_core()
     encoder = Sequential(encoder)
-    # decoder = Sequential(decoder)
     augmentor, cost, opt = get_title_augmentor(vocab_size=vocab_size)
     augmentor = Sequential(augmentor)
     model = MultiModalModel(layers=[
