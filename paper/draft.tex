@@ -138,9 +138,27 @@ softmax layer with 14 outputs, one per class. The model minimize a cross-entropy
 %through $E_1$.
 
 \subsection{Evaluation}
+The evaluation procedure for all experiments is based on the classification accuracy of each statistical model on a held-out validation set.
+
+Before any learning happens, we begin by partitioning the dataset in two subsets: training and test. This split is achieved by first loading the entire dataset in memory and assigning the first 80\% examples to the validation set and the remaining 20\% to the test set. Doing so, we increase our confidence in the resulting accuracy. In preliminary experiments we observed that the majority of the models were highly overfitting the training set. In order to find better hyperparameters, we thus further partitioned the training set into a development and a validation set. (again an 80-20 split) Once the recall-variance trade-off reached a satisfactory level on the development and validation set, we train all models using the same hyperparameters on the entire (identical) training set, and evaluate them on the test set.
+
+The training for evaluation is performed as follows. We begin by training a single encoder and the decoder on a single modality.
+(eg, the content of the articles) We measure the obtained accuracy on the test set and serialize the model's parameters on disk. In the second step, we recreate the previously trained encoder and decoder, and initialize them with their respective serialized parameters. We also instantiate a new encoder architecturally identical to the first one but with untrained parameters. Finally, we load both the previous and the new modality from the dataset and their corresponding labels, before proceeding to the training steps as described in the previous sections.
+ 
+Paragraph: By using a standardized ds, we can fairly compare models...
 
 
 \section{Results}\label{results}
+
+Needs results for:
+
+1. single model on authors
+2. single model on content
+3. single model on titles
+4. multimodal on authors-content
+5. multimodal on title-content
+6. ? multimodal author-titles ?
+
 \subsection{Baseline}
 \subsection{Proposed System}
 
