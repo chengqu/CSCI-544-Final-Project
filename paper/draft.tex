@@ -84,16 +84,16 @@ Although we could have used any kind of mapping, we chose to use deep
 learning algorithms, as they easily learn hierarchical representations
 and have been known to highly outperform other statistical techniques on
 natural language tasks. Learning embeddings has been previously done by
-\href{References}{{[}1{]}}, although our proposed contribution is
-slightly different. \href{References}{{[}1{]}} used deep autoencoders to
+\cite{zhuang2015supervised}, although our proposed contribution is
+slightly different. \cite{zhuang2015supervised} used deep autoencoders to
 obtain a better initialization of the parameters of their model. Our
 approach instead is much closer in spirit to the work of Sutskever
-\href{References}{{[}3{]}} and Vinyals \href{References}{{[}4{]}}. They
+\cite{sutskever2014sequence} and Vinyals \cite{vinyals2015grammar}. They
 both use encoders on a sequence of data to generate a
 \emph{thought-vector} which will then be decoded in the desired terget
 sequence. In some sense, our proposal adds the transfer learning
 component to their contribution. This approach is also similar to the
-work of Karpathy \& al \href{References}{{[}5{]}} where they mapped
+work of Karpathy \& al \cite{karpathy2014deep} where they mapped
 images to their captions with embeddings.
 
 \section{Method}\label{method}
@@ -142,7 +142,7 @@ content of the articles and the second on their authors. Identical architectures
 systems. The baseline system is a recurrent neural network with one hidden Long
 Short Term Memory (LSTM) layer succeeding the embedding layer. The dimension of
 both the embedding layer and the LSTM was fixed to 128. The output layer is a
-softmax layer with 14 outputs, one per class. The model minimize a cross-entropy loss using adaptive gradient descent. \href{References}{{[}6{]}}
+softmax layer with 14 outputs, one per class. The model minimize a cross-entropy loss using adaptive gradient descent. \cite{duchi2011adaptive}
 
 %\subsubsection{Proposed System}
 %The procedure is quite straight-forward. While part of the team worked on
@@ -184,34 +184,10 @@ TODO: Say if we ended up using RecurrentSum or RecurrentMean for the embedding. 
 
 \section{Discussion}\label{discussion}
 
-\section{References}\label{References}
 
-Part of the relevant literature review. More literature was involved for
-the deep learning part.
+\bibliography{reference} 
+\bibliographystyle{ieeetr}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  Supervised Representation Learning: Transfer Learning with Deep
-  Autoencoders, Zhuang \& al,
-  http://ijcai.org/Proceedings/15/Papers/578.pdf
-\item
-  Transfer Learning via Dimensionality Reduction, Pan \& al,
-
-  https://www.cse.ust.hk/\textasciitilde{}jamesk/papers/aaai08.pdf
-\item
-  Sequence to Sequence Learning with Neural Networks, Sutskever \& al,
-
-  http://arxiv.org/abs/1409.3215
-\item
-  Grammar as a Foreign Language, Vinyals \& al,
-  http://arxiv.org/abs/1412.7449
-\item
-  Deep Fragment Embeddings for Bidirectional Image Sentence Mapping,
-  Karpathy \& al, https://cs.stanford.edu/people/karpathy/nips2014.pdf
-
-\item Adaptive Subgradient Methods for Online Learning and Stochastic Optimization, Ducih \& al, http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf
-\end{enumerate}
 
 %\end{multicols}
 \end{document}
