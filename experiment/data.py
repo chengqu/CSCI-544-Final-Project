@@ -19,7 +19,7 @@ from neon.data import ArrayIterator
 from neon.data.dataloaders import load_imdb
 from neon.data.text_preprocessing import pad_data
 
-SENTENCE_LENGTH = 128
+SENTENCE_LENGTH = 2048
 
 
 def get_saudinet_data(args, modality='content'):

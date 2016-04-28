@@ -24,7 +24,7 @@ parser = NeonArgparser(__doc__)
 args = parser.parse_args(gen_be=False)
 
 # hyperparameters from the reference
-args.batch_size = 32
+args.batch_size = 128
 args.backend = 'gpu'
 
 
