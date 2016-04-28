@@ -95,12 +95,19 @@ images to their captions with embeddings.
 
 We used the freely available dataset from
 \url{https://github.com/ParallelMazen/SaudiNewsNet} The dataset contains
-a total of 31,030 Arabic newspaper articles, with title, author, date,
-url and content in each entry. Article objects are reprensented in json
+a total of 31,030 Arabic newspaper articles. Article objects are reprensented in json
 format, with UTF-8 encoding. We wrote a script to download the data from
-github repo, unzip each file, and read them in as json objects. The
-function can also give out content by key values such as title, author
-and etc.
+github repo, unzip each file, and read them in as json objects. Each json object 
+contains the flollowing fields:
+source: A string identified of the newspaper from which the article was extracted. It can have one of the following values:
+\begin{itemize}
+\item source: A string identifier of the newspaper from which the article was extracted.
+\item url: The full URL from which the article was extracted.
+\item date\_extracted: The timestamp of the date on which the article was extracted. It has the format YYYY-MM-DD hh:mm:ss. 
+\item title: The title of the article. 
+\item author: The author of the article.
+\item content: The content of the article.
+\end{itemize}
 
 \section{Procedure}\label{procedure}
 
