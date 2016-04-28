@@ -14,7 +14,7 @@ from neon.layers.container import Sequential, MergeMultistream, MergeBroadcast
 from neon.callbacks.callbacks import Callbacks
 from neon.transforms import Accuracy
 from neon.util.argparser import NeonArgparser, extract_valid_args
-from neon.layers import RecurrentSum
+from neon.layers import RecurrentSum, RecurrentMean
 
 from networks import load_core, get_title_augmentor
 from data import get_imdb, get_saudinet_data
@@ -24,7 +24,7 @@ parser = NeonArgparser(__doc__)
 args = parser.parse_args(gen_be=False)
 
 # hyperparameters from the reference
-args.batch_size = 128
+args.batch_size = 32
 args.backend = 'gpu'
 
 
@@ -67,12 +67,11 @@ if __name__ == '__main__':
     augmentor = Sequential(augmentor)
     model = MultiModalModel(layers=[
         MergeMultistream(layers=[encoder, augmentor], merge='recurrent'),
-        RecurrentSum(),
+        RecurrentMean(),
         decoder
     ])
 
     callbacks = Callbacks(model, **args.callback_args)
-
 
     # Train the model on the dataset
     model.fit(

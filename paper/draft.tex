@@ -73,6 +73,12 @@ without retraining our trained decoders and encoders.
 
 \[ E_{N+1}(x): \chi_{N+1} \rightarrow V_{N+1} \in \Re^M\]
 
+\begin{figure}[htbp]
+\centering
+\includegraphics{figs/multimodal.png}
+\caption{Multi-modal Transfer Learning}
+\end{figure}
+
 Although we could have used any kind of mapping, we chose to use deep
 learning algorithms, as they easily learn hierarchical representations
 and have been known to highly outperform other statistical techniques on
@@ -89,10 +95,8 @@ component to their contribution. This approach is also similar to the
 work of Karpathy \& al \href{References}{{[}5{]}} where they mapped
 images to their captions with embeddings.
 
-%\section{Method}\label{method}
-
-\section{Database}\label{materials}
-
+\section{Method}\label{method}
+\subsection{Materials}
 We used the freely available dataset from
 \url{https://github.com/ParallelMazen/SaudiNewsNet} The dataset contains
 a total of 31,030 Arabic newspaper articles. Article objects are reprensented in json
@@ -109,45 +113,70 @@ source: A string identified of the newspaper from which the article was extracte
 \item content: The content of the article.
 \end{itemize}
 
-\section{Procedure}\label{procedure}
+\subsection{Procedure}\label{procedure}
 
-\subsection{Data Pre-processing and Features}
+\subsubsection{Data Pre-processing and Features}
 
 Firstly, the UTF-8 encoded data was checked for trailing spaces for removal. Next, the data was filtered by removing punctuation symbols, retaining only a subset consisting of \{$,$ $.$ $!$ $($ $)$ $?$\}. The data was then split into words which are used as tokens for building the vocabulary and finally obtaining a feature representation for training the neural network. A vocabulary is constructed by assigning unique integer word-ids to each unique word appearing in the corpora. The punctuations are treated as a separate token and contributes to the vocabulary. The url, date and title fields of the corpora were discarded since they were irrelevant for our purpose.  
 
 After building the vocabulary for the corpora, the original sentences of the corpora are mapped on a word-basis to obtain a series of integers representing the sentence equivalent which form the features to be input to the embedding layer of the neural network. Alternatively, the integer mapping could be replaced with one-hot sparse encoding of each word constituting the sentence. The features are shuffled and split for training and testing. For efficient data storage and retrieval the features are compressed to HDF5 file format.
 
-
-\subsection{Neural Network Architecture}
 \subsubsection{Embedding Layer}
-An embedding layer is used to compute a word embedding $W: words \mapsto \mathbb{R}^{n}$ which is a function mapping words of a language to a high dimensional vectors which are continuous, distributed representation of the vocabulary words with good semantic properties. The hope of such a representation is to project similar words to similar regions in the hyper-space from a semantic point of view.
-\subsection{Baseline System}
-Two baseline systems are constructed, one to classify the journals based on the content of the articles and the second to classify the journals based on the authors of the articles. Identical architectures are used for both the baseline systems. The baseline system is a shallow neural network with one hidden Long Short Term Memory (LSTM) layer succeeding the embedding layer. The dimension of both the embedding layer and the LSTM was fixed to 128. The output layer is a soft-max layer with 14 dimension for each class representing each journal. Cross-Entropy loss function was used as an objective function to train the neural network using Adaptive-Gradient (Adagrad).
+An embedding layer is used to compute a word embedding $W: words \mapsto \mathbb{R}^{n}$ which is a function mapping words of a language to a high dimensional vectors which are continuous, distributed representation of the vocabulary words with good semantic properties. The hope of such a representation is to project similar words to similar regions in the hyper-space from a semantic point of view. 
 
-\subsection{Proposed System}
-The procedure is quite straight-forward. While part of the team worked
-on building our tailored dataset, the other half worked on the model
-definition and training procedure.
+We tried two approaches when building the vector embedding from multiple modalities. The first one was to vertically stack the different embeddings from the different encoders and learn the actual embedding from a linear combination from this higher dimensional vector. This led to poor results and we instead decided to experiment with both the summing over every embedding, as well as taking their mean in each dimension.
 
-Once every pre-requisite is available, we trained the first encoder
-$E_1$ (implemented as a recurrent neural network) to build the embedding
-$V_1$. Since we only dealt with a relatively simple classification task,
-our decoder $D_1$ was simply a fully connected multi-layer perceptron.
-They were jointly trained end-to-end by propagating the gradients
-through the embedding from $D_1$ to $E_1$.
+\subsubsection{Discriminative Model}
 
-The second training step was to train the second encoder $E_2$. Again,
-we also performed training end-to-end, but specifically did not
-propagate the gradients through $E_1$.
+%\subsubsection{Baseline System}
+We construct two baseline systems, one to classify the journals based on the
+content of the articles and the second on their authors. Identical architectures are used for both the baseline
+systems. The baseline system is a recurrent neural network with one hidden Long
+Short Term Memory (LSTM) layer succeeding the embedding layer. The dimension of
+both the embedding layer and the LSTM was fixed to 128. The output layer is a
+softmax layer with 14 outputs, one per class. The model minimize a cross-entropy loss using adaptive gradient descent. \href{References}{{[}6{]}}
 
-\subsection{Evaluation Metrics}\label{evaluation}
+%\subsubsection{Proposed System}
+%The procedure is quite straight-forward. While part of the team worked on
+%building our tailored dataset, the other half worked on the model definition
+%and training procedure.
+
+%Once every pre-requisite is available, we trained the first encoder $E_1$
+%(implemented as a recurrent neural network) to build the embedding $V_1$. Since
+%we only dealt with a relatively simple classification task, our decoder $D_1$
+%was simply a fully connected multi-layer perceptron. They were jointly trained
+%end-to-end by propagating the gradients through the embedding from $D_1$ to
+%$E_1$.
+
+%The second training step was to train the second encoder $E_2$. Again, we also
+%performed training end-to-end, but specifically did not propagate the gradients
+%through $E_1$.
+
+\subsection{Evaluation}
+The evaluation procedure for all experiments is based on the classification accuracy of each statistical model on a held-out validation set.
+
+Before any learning happens, we begin by partitioning the dataset in two subsets: training and test. This split is achieved by first loading the entire dataset in memory and assigning the first 80\% examples to the validation set and the remaining 20\% to the test set. Doing so, we increase our confidence in the resulting accuracy. In preliminary experiments we observed that the majority of the models were highly overfitting the training set. In order to find better hyperparameters, we thus further partitioned the training set into a development and a validation set. (again an 80-20 split) Once the recall-variance trade-off reached a satisfactory level on the development and validation set, we train all models using the same hyperparameters on the entire (identical) training set, and evaluate them on the test set.
+
+The training for evaluation is performed as follows. We begin by training a single encoder and the decoder on a single modality.
+(eg, the content of the articles) We measure the obtained accuracy on the test set and serialize the model's parameters on disk. In the second step, we recreate the previously trained encoder and decoder, and initialize them with their respective serialized parameters. We also instantiate a new encoder architecturally identical to the first one but with untrained parameters. Finally, we load both the previous and the new modality from the dataset and their corresponding labels, before proceeding to the training steps as described in the previous sections.
 
 \section{Results}\label{results}
-\subsection{Baseline}
-\subsection{Proposed System}
+
+Needs results for:
+
+1. single model on authors
+2. single model on content
+3. single model on titles
+4. multimodal on authors-content
+5. multimodal on title-content
+6. ? multimodal author-titles ?
+
+TODO: Say if we ended up using RecurrentSum or RecurrentMean for the embedding. (see embedding layer section)
+
+
 \section{Discussion}\label{discussion}
 
-\section{References}\label{references}
+\section{References}\label{References}
 
 Part of the relevant literature review. More literature was involved for
 the deep learning part.
@@ -172,6 +201,8 @@ the deep learning part.
 \item
   Deep Fragment Embeddings for Bidirectional Image Sentence Mapping,
   Karpathy \& al, https://cs.stanford.edu/people/karpathy/nips2014.pdf
+
+\item Adaptive Subgradient Methods for Online Learning and Stochastic Optimization, Ducih \& al, http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf
 \end{enumerate}
 
 %\end{multicols}

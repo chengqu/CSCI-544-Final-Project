@@ -18,10 +18,14 @@ from neon.data.text_preprocessing import get_paddedXY
 from neon.data import ArrayIterator
 from neon.data.dataloaders import load_imdb
 from neon.data.text_preprocessing import pad_data
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 SENTENCE_LENGTH = 128
-
-
+np.random.seed(0)
+blue_patch = mpatches.Patch(color="blue", label="Dataset")
 def get_saudinet_data(args, modality='content'):
     """ Returns a train and validation dataset from SaudiNewsNet. """
     # get the preprocessed and tokenized data
@@ -39,6 +43,12 @@ def get_saudinet_data(args, modality='content'):
     y = [xy[0] for xy in Xy]
     X_train, y_train = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=SENTENCE_LENGTH)
     # train_set = ArrayIterator(X_train, y_train, nclass=nclass)
+    journals, counts = np.unique(y, return_counts=True)
+    print 'Train set class distribution - ', journals, counts
+    plt.bar(journals, counts, 1/1.5, color="green")
+    green_patch = mpatches.Patch(color="green", label="Train Set")
+    plt.legend(handles=[blue_patch,green_patch])
+    plt.savefig('./train_class_distribution.png')
 
     # make valid dataset
     Xy = h5valid[:nvalid]
@@ -46,6 +56,12 @@ def get_saudinet_data(args, modality='content'):
     y = [xy[0] for xy in Xy]
     X_valid, y_valid = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=SENTENCE_LENGTH)
     # valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
+    journals, counts = np.unique(y, return_counts=True)
+    print 'Validation set class distribution - ', journals, counts
+    plt.bar(journals, counts, 1/1.5, color="red")
+    red_patch = mpatches.Patch(color="red", label="Test Set")
+    plt.legend(handles=[blue_patch,green_patch,red_patch])
+    plt.savefig('./test_class_distribution.png')
 
     return (X_train, y_train), (X_valid, y_valid), nclass, vocab_size
 
@@ -204,6 +220,11 @@ def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv'
         print '# of samples - ', nsamples
         print '# of classes', nclass
         print 'class distribution - ', ratings, counts
+        plt.bar(ratings, counts, 1/1.5, color="blue")
+        plt.legend(handles=[blue_patch])
+        plt.xlabel('class')
+        plt.ylabel('count')
+        plt.savefig('./data_class_distribution.png')
         sen_counts = zip(sen_len, sen_len_counts)
         sen_counts = sorted(sen_counts, key=lambda kv: kv[1], reverse=True)
         print 'sentence length - ', len(sen_len), sen_len, sen_len_counts
