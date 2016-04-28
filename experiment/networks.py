@@ -73,7 +73,7 @@ def get_core_net(embedding_size=128, vocab_size=20000, nout=10, dropout_rate = 0
     return (enc, dec), cost, opt
 
 
-def load_core(file_prefix,embedding_size=128):
+def load_core(file_prefix, embedding_size=128):
     enc = Model(file_prefix + '_encoder.neon').layers.layers
     dec = Model(file_prefix + '_decoder.neon').layers.layers
     return enc, dec
