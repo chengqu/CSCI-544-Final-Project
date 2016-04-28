@@ -1,3 +1,4 @@
+
 \author{Group 40: Arnold, Gurunat, Huang, \& Qu}
 \title{Modular Deep Encoder-Decoders}
 \date{\today}
@@ -99,8 +100,15 @@ images to their captions with embeddings.
 \subsection{Materials}
 We used the freely available dataset from
 \url{https://github.com/ParallelMazen/SaudiNewsNet} The dataset contains
-a total of 31,030 Arabic newspaper articles. Article objects are reprensented in json
-format, with UTF-8 encoding. We wrote a script to download the data from
+a total of 31,030 Arabic newspaper articles, with a total number of 8,758,976 words. 
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figures/article-newspaper_distribution.png}
+\caption{Figure shows article-newspaper distribution}
+\end{figure}
+
+Article objects are reprensented in json format, with UTF-8 encoding. We wrote a script to download the data from
 github repo, unzip each file, and read them in as json objects. Each json object 
 contains the flollowing fields:
 source: A string identified of the newspaper from which the article was extracted. It can have one of the following values:
