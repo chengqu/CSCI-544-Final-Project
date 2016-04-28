@@ -89,10 +89,8 @@ component to their contribution. This approach is also similar to the
 work of Karpathy \& al \href{References}{{[}5{]}} where they mapped
 images to their captions with embeddings.
 
-%\section{Method}\label{method}
-
-\section{Database}\label{materials}
-
+\section{Method}\label{method}
+\subsection{Materials}
 We used the freely available dataset from
 \url{https://github.com/ParallelMazen/SaudiNewsNet} The dataset contains
 a total of 31,030 Arabic newspaper articles, with title, author, date,
@@ -102,22 +100,22 @@ github repo, unzip each file, and read them in as json objects. The
 function can also give out content by key values such as title, author
 and etc.
 
-\section{Procedure}\label{procedure}
+\subsection{Procedure}\label{procedure}
 
-\subsection{Data Pre-processing and Features}
+\subsubsection{Data Pre-processing and Features}
 
 Firstly, the UTF-8 encoded data was checked for trailing spaces for removal. Next, the data was filtered by removing punctuation symbols, retaining only a subset consisting of \{$,$ $.$ $!$ $($ $)$ $?$\}. The data was then split into words which are used as tokens for building the vocabulary and finally obtaining a feature representation for training the neural network. A vocabulary is constructed by assigning unique integer word-ids to each unique word appearing in the corpora. The punctuations are treated as a separate token and contributes to the vocabulary. The url, date and title fields of the corpora were discarded since they were irrelevant for our purpose.  
 
 After building the vocabulary for the corpora, the original sentences of the corpora are mapped on a word-basis to obtain a series of integers representing the sentence equivalent which form the features to be input to the embedding layer of the neural network. Alternatively, the integer mapping could be replaced with one-hot sparse encoding of each word constituting the sentence. The features are shuffled and split for training and testing. For efficient data storage and retrieval the features are compressed to HDF5 file format.
 
-
-\subsection{Neural Network Architecture}
+%\subsubsection{Neural Network Architecture}
 \subsubsection{Embedding Layer}
 An embedding layer is used to compute a word embedding $W: words \mapsto \mathbb{R}^{n}$ which is a function mapping words of a language to a high dimensional vectors which are continuous, distributed representation of the vocabulary words with good semantic properties. The hope of such a representation is to project similar words to similar regions in the hyper-space from a semantic point of view.
-\subsection{Baseline System}
+
+\subsubsection{Baseline System}
 Two baseline systems are constructed, one to classify the journals based on the content of the articles and the second to classify the journals based on the authors of the articles. Identical architectures are used for both the baseline systems. The baseline system is a shallow neural network with one hidden Long Short Term Memory (LSTM) layer succeeding the embedding layer. The dimension of both the embedding layer and the LSTM was fixed to 128. The output layer is a soft-max layer with 14 dimension for each class representing each journal. Cross-Entropy loss function was used as an objective function to train the neural network using Adaptive-Gradient (Adagrad).
 
-\subsection{Proposed System}
+\subsubsection{Proposed System}
 The procedure is quite straight-forward. While part of the team worked
 on building our tailored dataset, the other half worked on the model
 definition and training procedure.
@@ -133,7 +131,8 @@ The second training step was to train the second encoder $E_2$. Again,
 we also performed training end-to-end, but specifically did not
 propagate the gradients through $E_1$.
 
-\subsection{Evaluation Metrics}\label{evaluation}
+\subsection{Evaluation}
+
 
 \section{Results}\label{results}
 \subsection{Baseline}
