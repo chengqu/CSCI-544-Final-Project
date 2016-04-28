@@ -73,6 +73,12 @@ without retraining our trained decoders and encoders.
 
 \[ E_{N+1}(x): \chi_{N+1} \rightarrow V_{N+1} \in \Re^M\]
 
+\begin{figure}[htbp]
+\centering
+\includegraphics{figs/multimodal.png}
+\caption{Multi-modal Transfer Learning}
+\end{figure}
+
 Although we could have used any kind of mapping, we chose to use deep
 learning algorithms, as they easily learn hierarchical representations
 and have been known to highly outperform other statistical techniques on
@@ -109,7 +115,9 @@ Firstly, the UTF-8 encoded data was checked for trailing spaces for removal. Nex
 After building the vocabulary for the corpora, the original sentences of the corpora are mapped on a word-basis to obtain a series of integers representing the sentence equivalent which form the features to be input to the embedding layer of the neural network. Alternatively, the integer mapping could be replaced with one-hot sparse encoding of each word constituting the sentence. The features are shuffled and split for training and testing. For efficient data storage and retrieval the features are compressed to HDF5 file format.
 
 \subsubsection{Embedding Layer}
-An embedding layer is used to compute a word embedding $W: words \mapsto \mathbb{R}^{n}$ which is a function mapping words of a language to a high dimensional vectors which are continuous, distributed representation of the vocabulary words with good semantic properties. The hope of such a representation is to project similar words to similar regions in the hyper-space from a semantic point of view.
+An embedding layer is used to compute a word embedding $W: words \mapsto \mathbb{R}^{n}$ which is a function mapping words of a language to a high dimensional vectors which are continuous, distributed representation of the vocabulary words with good semantic properties. The hope of such a representation is to project similar words to similar regions in the hyper-space from a semantic point of view. 
+
+We tried two approaches when building the vector embedding from multiple modalities. The first one was to vertically stack the different embeddings from the different encoders and learn the actual embedding from a linear combination from this higher dimensional vector. This led to poor results and we instead decided to experiment with both the summing over every embedding, as well as taking their mean in each dimension.
 
 \subsubsection{Discriminative Model}
 
@@ -144,9 +152,6 @@ Before any learning happens, we begin by partitioning the dataset in two subsets
 
 The training for evaluation is performed as follows. We begin by training a single encoder and the decoder on a single modality.
 (eg, the content of the articles) We measure the obtained accuracy on the test set and serialize the model's parameters on disk. In the second step, we recreate the previously trained encoder and decoder, and initialize them with their respective serialized parameters. We also instantiate a new encoder architecturally identical to the first one but with untrained parameters. Finally, we load both the previous and the new modality from the dataset and their corresponding labels, before proceeding to the training steps as described in the previous sections.
- 
-Paragraph: By using a standardized ds, we can fairly compare models...
-
 
 \section{Results}\label{results}
 
@@ -159,8 +164,7 @@ Needs results for:
 5. multimodal on title-content
 6. ? multimodal author-titles ?
 
-\subsection{Baseline}
-\subsection{Proposed System}
+TODO: Say if we ended up using RecurrentSum or RecurrentMean for the embedding. (see embedding layer section)
 
 
 \section{Discussion}\label{discussion}
