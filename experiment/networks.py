@@ -22,10 +22,11 @@ from neon.transforms import (
     Logistic,
     Softmax,
     CrossEntropyMulti,
+    Explin,
+    Normalizer,
 )
 
 
-SAVE_PATH = './saved_models/'
 
 
 def get_cost_opt():
@@ -35,25 +36,36 @@ def get_cost_opt():
     return cost, opt
 
 
-def get_core_net(embedding_size=128, vocab_size=20000, nout=10):
+def get_core_net(embedding_size=128, vocab_size=20000, nout=10, dropout_rate = 0.5, activation_function = 1):
     """
     Returns a tuple containing the original encoder and decoder networks.
     embedd_size: size of the output of the encoder
     nout: size of the output of the decoder
     path: filepath from which the weights should be loaded
     """
-    embedding_dim = 128
+    if activation_function == 1:
+        af = Tanh()
+    if activation_function == 2:
+        af = Explin(alpha=0)
+    if activation_function == 3:
+        af = Logistic()
+    if activation_function == 4:
+        af = Normalizer()
+
+
+    embedding_dim = embedding_size
     uni = Uniform(low=-0.1/embedding_dim, high=0.1/embedding_dim)
     glorot = GlorotUniform()
 
     enc = [
         LookupTable(vocab_size=vocab_size, embedding_dim=embedding_dim, init=uni, pad_idx=0, update=True),
-        LSTM(embedding_size, glorot, activation=Tanh(), gate_activation=Logistic(), reset_cells=True),
+        LSTM(embedding_size, glorot, activation=af, gate_activation=Logistic(), reset_cells=True),
         RecurrentSum(),
     ]
 
     dec = [
         Dropout(keep=0.25),
+        Dropout(keep=dropout_rate),
         Affine(nout, glorot, bias=glorot, activation=Softmax())
     ]
 
@@ -61,17 +73,15 @@ def get_core_net(embedding_size=128, vocab_size=20000, nout=10):
     return (enc, dec), cost, opt
 
 
-def load_core(embedding_size=128):
-    uni = Uniform(low=-0.1/embedding_size, high=0.1/embedding_size)
-    enc = Model(SAVE_PATH + 'encoder.neon').layers.layers
-    dec = Model(SAVE_PATH + 'decoder.neon').layers.layers
+def load_core(file_prefix,embedding_size=128):
+    enc = Model(file_prefix + '_encoder.neon').layers.layers
+    dec = Model(file_prefix + '_decoder.neon').layers.layers
     return enc, dec
-    # return enc, [Linear(embedding_size, uni), ] + dec
 
 
-def save_core(encoder, decoder):
-    Model(encoder).save_params(SAVE_PATH + 'encoder.neon', True)
-    Model(decoder).save_params(SAVE_PATH + 'decoder.neon', True)
+def save_core(file_prefix,encoder, decoder):
+    Model(encoder).save_params(file_prefix + '_encoder.neon', True)
+    Model(decoder).save_params(file_prefix + '_decoder.neon', True)
 
 
 def get_title_augmentor(vocab_size=20000, embedding_size=128, path=None):

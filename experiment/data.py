@@ -31,7 +31,8 @@ def get_saudinet_data(args, modality='content'):
     """ Returns a train and validation dataset from SaudiNewsNet. """
     # get the preprocessed and tokenized data
     article = load_articles("./SaudiNewsNet")
-    fname_h5, fname_vocab = preprocess_data_train(article, modality, './labeledTrainData.tsv')
+    filepath = './' + modality + '_labledTraindata.tsv'
+    fname_h5, fname_vocab = preprocess_data_train(article, modality, filepath=filepath)
 
     h5f = h5py.File(fname_h5, 'r')
     data, h5train, h5valid = h5f['data'], h5f['train'], h5f['valid']
@@ -135,7 +136,6 @@ def clean_string_unicode(string):
     string = regex.sub(ur"\?", " \? ", string)
     # string = regex.sub(ur"\s{2,}", " ", string)
     return string.strip()
-
 
 def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv', vocab_file=None, vocab=None, train_ratio=0.8):
     np.random.seed(1234)
