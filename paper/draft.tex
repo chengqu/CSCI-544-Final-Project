@@ -36,22 +36,31 @@
 \maketitle
 \hfill
 \begin{abstract}
-In this short paper we propose an approach to transfer learning using rich
-vector embeddings. The suggested technique can be applied to any supervised
-task, and it handles multiple sources and changing sources of data without the
-need for retraining. To verify our ideas, we apply our ideas to the task of
-text-classification.
+%In this short paper we propose an approach to transfer learning using rich
+%vector embeddings. The suggested technique can be applied to any supervised
+%task, and it handles multiple sources and changing sources of data without the
+%need for retraining. To verify our ideas, we apply our ideas to the task of
+%text-classification.
+
+In this short paper, we propose a Modular Deep Encoder-Decoder network (MDED) for text classification. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data by adding a new encoder to the network. MDED has been applied to text classification on SaudiNewsNet. A modular Long Short Term Memory (LSTM) network is built. Experimental results show that our algorithm can efficiently combine new source of data and pre-trained model. (show some summaries of experimental results here)
+
 \end{abstract}
 
 \section{Introduction}\label{introduction}
 
-Our goal is to generate rich vector embeddings from articles to classify
-them into predefined categories. Then, we want to extend our model with
-an additional source of data: the title of the videos. To handle this
-new knowledge source without retraining our previous model, we suggest
-to generate a new embedding that will be used to modify the original
-one. This combined embedding will then be used for the classification
-task.
+%Our goal is to generate rich vector embeddings from articles to classify
+%them into predefined categories. Then, we want to extend our model with
+%an additional source of data: the title of the videos. To handle this
+%new knowledge source without retraining our previous model, we suggest
+%to generate a new embedding that will be used to modify the original
+%one. This combined embedding will then be used for the classification
+%task.
+
+In the past decade, deep learning has been successfully applied to natural language processing (NLP). It has been shown that end-to-end trained deep learning algorithms can outperform traditional algorithms on various NLP tasks.
+
+
+However, the training process of deep learning algorithms is usually very time-consuming. And it is inefficient to update a model and re-train it from scratch everytime there is a new data source coming. To alleviate this problem, a novel Modular Deep Encoder-Decoder network (MDED) is proposed in this paper. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data by adding a new encoder to the network. 
+
 
 More formally, we want to jointly learn a set of \emph{encoder}
 functions $\{E_i\}_0^N$ mapping samples $x \sim \chi_i$ from a set of
@@ -170,16 +179,96 @@ The training for evaluation is performed as follows. We begin by training a sing
 
 \section{Results}\label{results}
 
-Needs results for:
+\subsection{Single LSTM network}
 
-1. single model on authors
-2. single model on content
-3. single model on titles
-4. multimodal on authors-content
-5. multimodal on title-content
-6. ? multimodal author-titles ?
 
-TODO: Say if we ended up using RecurrentSum or RecurrentMean for the embedding. (see embedding layer section)
+First, three single LSTM networks are trained for text classification, where title, author and content values are used for training data, respectively. The classification performance of them are reported in Table.\ref{single_lstm_acc}. From Table.\ref{single_lstm_acc} we can see that xxx model has the best classification performance among these three models.
+
+\begin{table}[!t]
+\begin{center}
+\caption{Classification performance of single LSTM network}
+\label{single_lstm_acc}
+\begin{tabular}{c|c|c|c}
+\hline
+Training data & Title & Author & Content\\
+\hline
+
+Training accuracy &  &  &  \\
+
+Testing accuracy & & & \\
+
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Moreover, the training behavior of these three models are presented in Fig.\ref{training_loss_single}.
+
+
+\begin{figure}[!t]
+\begin{center}
+%\includegraphics[width=2.8in]{path_sample.eps}
+\end{center}
+\caption{Training loss and testing loss of single LSTM networks.}
+\label{training_loss_single}
+\end{figure}
+
+
+
+\subsection{Modular LSTM network}
+
+In oder to further improve the classification performance, new sources of training data are added to the base single LSTM network. For each single LSTM network, two other data source are added to it, respectively. For example, for content LSTM network, author of the articles and title of the articles are added to it as an additional source of training data. Technically, a new encoder is added to the original LSTM network. Performance of these modular LSTM networks are reported in Table.\ref{modular_lstm_acc}.
+
+\begin{table}[!t]
+\begin{center}
+\caption{Classification performance of modular LSTM networks}
+\label{modular_lstm_acc}
+\begin{tabular}{c|cc|cc|cc}
+\hline
+
+Base source & \multicolumn{2}{c}{Title} & \multicolumn{2}{c}{Content} & \multicolumn{2}{c}{Author} \\
+\hline
+New source   &   Content   &   Author     &       Title  & Author                &            Content & Title \\
+\hline
+Training acc   &                   &                  &                &                           &                           & \\
+Tesging acc   &                   &                  &                &                           &                           & \\
+
+\hline
+
+
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+Moreover, the training behavior of them are presented in Fig.\ref{training_loss_modular}.
+
+
+\begin{figure}[!t]
+\begin{center}
+%\includegraphics[width=2.8in]{path_sample.eps}
+\end{center}
+\caption{Training loss and testing loss of modular LSTM networks.}
+\label{training_loss_modular}
+\end{figure}
+
+
+
+
+
+
+%Needs results for:
+
+%1. single model on authors
+%2. single model on content
+%3. single model on titles
+%4. multimodal on authors-content
+%5. multimodal on title-content
+%6. ? multimodal author-titles ?
+
+%TODO: Say if we ended up using RecurrentSum or RecurrentMean for the embedding. (see embedding layer section)
 
 
 \section{Discussion}\label{discussion}

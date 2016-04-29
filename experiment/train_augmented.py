@@ -57,10 +57,53 @@ if __name__ == '__main__':
     be = gen_backend(**extract_valid_args(args, gen_backend))
 
     # Load the dataset
+<<<<<<< Updated upstream
     (X_train_content, y_train_content), (X_test_content, y_test_content), nout, vocab_size = get_saudinet_data(args, modality=modal1)
     (X_train_title, y_train_title), (X_test_title, y_test_title), nout, vocab_size = get_saudinet_data(args, modality=modal2)
     train_set = ArrayIterator([X_train_content, X_train_title], y_train_content, nout)
     test_set = ArrayIterator([X_test_content, X_test_title], y_test_content, nout)
+=======
+    (X_train_content, y_train_content), (X_test_content, y_test_content), nout, vocab_size = get_saudinet_data(args, modality='content')
+    (X_train_title, y_train_title), (X_test_title, y_test_title), nout, vocab_size = get_saudinet_data(args, modality='title')
+    (X_train_authors, y_train_authors), (X_test_authors, y_test_authors), nout, vocab_size = get_saudinet_data(args, modality='author')
+    
+    
+    X_train, X_test = {}, {}
+    X_train['content-author'], X_test['content-author'] = [X_train_content,X_train_authors], [X_test_content,X_test_authors]
+    X_train['content-title'], X_test['content-title'] = [X_train_content,X_train_title], [X_test_content,X_test_title]
+    
+    X_train['title-author'], X_test['title-author'] = [X_train_title,X_train_authors], [X_test_title, X_test_authors]
+    X_train['title-content'], X_test['title-content'] = [X_train_title,X_train_content], [X_test_title, X_test_content]
+    
+    X_train['author-content'], X_test['author-content'] = [X_train_authors, X_train_content], [X_test_authors, X_test_content]
+    X_train['author-title'], X_test['author-title'] = [X_train_authors, X_train_title], [X_test_authors, X_test_title]
+
+    X_train['content-author-title'], X_test['content-author-title'] = [X_train_content,X_train_authors,X_train_title], [X_test_content,X_test_authors,X_test_title]
+
+    X_train['title-author-content'], X_test['title-author-content'] = [X_train_title,X_train_authors,X_train_content], [X_test_title, X_test_authors,X_test_content]
+
+    X_train['author-content-title'], X_test['author-content-title'] = [X_train_authors, X_train_content,X_train_title], [X_test_authors, X_test_content,X_test_title]
+
+    Y_train, Y_test = {}, {}
+    Y_train['content'], Y_test['content'] = y_train_content, y_test_content
+    Y_train['author'], Y_test['author'] = y_train_authors, y_test_authors
+    Y_train['title'], Y_test['title'] = y_train_title, y_test_title
+
+
+
+
+    
+    data_source_keyword = args.initial_model + '-' + args.new_data_source
+    
+    
+    train_set = ArrayIterator( X_train[data_source_keyword], Y_train[args.initial_model], nout)
+    test_set = ArrayIterator(  X_test[data_source_keyword],  Y_test[args.initial_model],  nout)
+    
+    
+    
+    #train_set = ArrayIterator([X_train_content, X_train_title], y_train_content, nout)
+    #test_set = ArrayIterator([X_test_content, X_test_title], y_test_content, nout)
+>>>>>>> Stashed changes
 
     # Build the network
     file_prefix = './saved_models/' + modal1
