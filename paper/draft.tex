@@ -181,7 +181,7 @@ Using the development set, the hyper-parameters were fine-tuned for better perfo
 %through $E_1$.
 
 \subsection{Evaluation}
-The evaluation procedure for all experiments is based on the classification accuracy of each statistical model on a held-out validation set.
+The evaluation procedure for all experiments is based on the classification accuracy of each statistical model on a held-out validation set. Each time we use the newly built model to generate a result, and use the result from jointly trained model to compare. This held-out validation scheme has a better reprensentation of the negative or positive contribution the new model has, compared to just using the joint model's accuracy. We provide accuracy in the results. However, the accuracy is not enough. More meeaningful F1-score or AUC metrics will be provided during the future work.  
 
 \section{Results}\label{results}
 
