@@ -122,6 +122,12 @@ Article objects are represented in json format, with UTF-8 encoding. We wrote a 
 \item content: The content of the article.
 \end{itemize}
 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{figures/title_example.png}
+\caption{An example of an article title}
+\end{figure}
+
 The dataset is partitioned into training, development and testing subsets. 80\% of the data is assigned for training and 10\% for development and testing. The development set is utilized for hyper-parameter tuning and the results are finally presented on the testing set. During partitioning, care is taken to ensure appropriate percentage of data is seen in all the classes. Figure~\ref{fig:dist} shows the distribution of data used for training and testing in each class. Figure~\ref{fig:sent_dist} shows the distribution of sentence lengths of the content of the articles.
 
 \begin{figure}[h!]
