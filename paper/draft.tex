@@ -38,7 +38,7 @@
 %need for retraining. To verify our ideas, we apply our ideas to the task of
 %text-classification.
 
-In this short paper, we propose a Modular Deep Encoder-Decoder network (MDED) for text classification. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data modality by adding a new encoder to the network. MDED has been applied to text classification on SaudiNewsNet. A modular Long Short Term Memory (LSTM) network is built. Experimental results show that our algorithm can efficiently combine new source of data and pre-trained model. (show some summaries of experimental results here)
+In this short paper, we propose a Modular Deep Encoder-Decoder network (MDED) for text classification. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data modality by adding a new encoder to the network. MDED has been applied to text classification on Saudi Newspapers Arabic Corpus (SaudiNewsNet). A modular Long Short Term Memory (LSTM) network is built. Experimental results show that our algorithm can efficiently combine new source of data and pre-trained model. (show some summaries of experimental results here)
 
 \end{abstract}
 
@@ -98,13 +98,12 @@ component to their contribution. This approach is also similar to the
 work of Karpathy \& al \cite{karpathy2014deep} where they mapped
 images to their captions with embeddings.
 
-In this paper, we evaluate the effectiveness of idea by applying the concept towards a simple NLP classification task. We adopt an Arabic newspaper article database to classify into different journals based on the article content, author and title.
+In this paper, we evaluate the effectiveness of idea by applying the concept towards a simple NLP classification task. We adopt Saudi Newspapers Arabic Corpus \cite{hagrima2015} to classify text into different journals based on the article content, author and title.
 
 \section{Method}\label{method}
 \subsection{Materials}
-We used the freely available dataset from
-\url{https://github.com/ParallelMazen/SaudiNewsNet} The dataset contains
-a total of 31,030 Arabic newspaper articles, with a total number of 8,758,976 words. 
+\subsubsection{Corpora}
+We use the freely available Saudi Newspapers Arabic Corpus \cite{hagrima2015}. The dataset contains a total of 31,030 Arabic newspaper articles, with a total number of 8,758,976 words. 
 
 \begin{figure}[h!]
 \centering
@@ -137,6 +136,9 @@ The dataset is partitioned into training, development and testing subsets. 80\% 
 \caption{Distribution of data for training and testing}\label{fig:sent_dist}
 \end{figure}
 
+\subsubsection{Tools}
+For training the neural networks, Neon toolkit was employed \cite{Neon}. Neon is Nervana's python based deep-learning library. The toolkit was chosen because of its flexibility of distributed training on both CPU and GPU and its good support for neural network components. 
+
 \subsection{Procedure}\label{procedure}
 
 \subsubsection{Data Pre-processing and Features}
@@ -161,6 +163,8 @@ systems. The baseline system is a recurrent neural network with one hidden Long 
 The training for evaluation is performed as follows. We begin by training a single encoder and the decoder on a single modality.
 (eg, the content of the articles) We measure the obtained accuracy on the test set and serialize the model's parameters on disk. In the second step, we recreate the previously trained encoder and decoder, and initialize them with their respective serialized parameters. We also instantiate a new encoder architecturally identical to the first one but with untrained parameters. Finally, we load both the previous and the new modality from the dataset and their corresponding labels, before proceeding to the training steps as described in the previous sections.
 
+\subsubsection{Hyper-parameter Tuning}
+Using the development set, the hyper-parameters were fine-tuned for better performance. The tuning of sentence length cut-off for training the embedding layer was found to be critical especially when training on the content of articles. Setting lower sentence length resulted in over-training of the system. The distribution of the sentence lengths were plotted as shown in Figure~\ref{fig:sent_dist}. Looking at the distribution, we found the value of 2048 to be optimal. Different values for learning rate, hidden-layer dimensionality and non-linearity were experimented. 
 %The procedure is quite straight-forward. While part of the team worked on
 %building our tailored dataset, the other half worked on the model definition
 %and training procedure.
@@ -194,9 +198,9 @@ First, three single LSTM networks are trained for text classification, where tit
 Training data & Title & Author & Content\\
 \hline
 
-Training accuracy &  &  &  \\
+Training accuracy &  & 83.5207\% & 88.8635\% \\
 
-Testing accuracy & & & \\
+Testing accuracy & & 79.7421 \% & 58.7276\% \\
 
 \hline
 \end{tabular}
@@ -278,5 +282,18 @@ Moreover, the training behavior of them are presented in Fig.\ref{training_loss_
 \bibliography{reference} 
 \bibliographystyle{ieeetr}
 
+\newpage
+\section{Labor Division}
+\begin{itemize}
+\item
+  \textbf{Cheng:} \textbf{Coding} - Data retrieval, unzipping, reading, unicode decoding; \textbf{Report Writing} - Corpora, Evaluation.
+\item
+  \textbf{Quiangui:} Hyper-parameter tuning; \textbf{Report Writing} - Results, Abstract, Introduction.
+\item
+  \textbf{Prashanth:} \textbf{Coding} - Data pre-processing, Data partitioning,  Feature representation for embedding layer, Baseline system; \textbf{Report Writing} - Data pre-processing and features, Embedding Layer, Baseline System, Hyper-parameter tuning.
+\item
+  \textbf{Sebastian:} \textbf{Coding} - Neural Network training, Makefiles; \textbf{Report Writing} - Abstract, Introduction, Proposed System, Discussion.
+\end{itemize}
+\section{Word Count}
 %\end{multicols}
 \end{document}
