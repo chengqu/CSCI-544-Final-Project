@@ -122,11 +122,12 @@ Article objects are represented in json format, with UTF-8 encoding. We wrote a 
 \item content: The content of the article.
 \end{itemize}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=\textwidth]{figures/title_example.png}
-\caption{An example of an article title}
-\end{figure}
+% This picture is not relevant to us
+%\begin{figure}[h!]
+%\centering
+%\includegraphics[width=\textwidth]{figures/title_example.png}
+%\caption{An example of an article title}
+%\end{figure}
 
 The dataset is partitioned into training, development and testing subsets. 80\% of the data is assigned for training and 10\% for development and testing. The development set is utilized for hyper-parameter tuning and the results are finally presented on the testing set. During partitioning, care is taken to ensure appropriate percentage of data is seen in all the classes. Figure~\ref{fig:dist} shows the distribution of data used for training and testing in each class. Figure~\ref{fig:sent_dist} shows the distribution of sentence lengths of the content of the articles.
 
@@ -187,7 +188,8 @@ Using the development set, the hyper-parameters were fine-tuned for better perfo
 %through $E_1$.
 
 \subsection{Evaluation}
-The evaluation procedure for all experiments is based on the classification accuracy of each statistical model on a held-out validation set. Each time we use the newly built model to generate a result, and use the result from jointly trained model to compare. This held-out validation scheme has a better reprensentation of the negative or positive contribution the new model has, compared to just using the joint model's accuracy. We provide accuracy in the results. However, the accuracy is not enough. More meeaningful F1-score or AUC metrics will be provided during the future work.  
+The evaluation procedure for all experiments is based on the classification accuracy of each statistical model on a held-out test data. Meanwhile, we identify that the accuracy is not an ideal evaluation criteria considering the skewed nature of class distribution. To get a more meaningful representation of the performance F1-score or AUC metrics will be provided in the future work. However we stress the validity of the accuracies provided in the results section by comparing it to the random baseline. Taking into account the multi-class (14 class problem) nature of the classification and the prior for each class, we would like to point out that the average accuracy or chance accuracy of the data is 9.68\% which forms the random baseline of the problem under investigation.
+
 
 \section{Results}\label{results}
 
@@ -283,7 +285,11 @@ Moreover, the training behavior of them are presented in Fig.\ref{training_loss_
 
 
 \section{Discussion}\label{discussion}
+The results of the baseline system for each modality by themselves show significant improvement over the random baseline. We asses that the author modality to be more informative for classification as expected due to low overlap of author names across journals.
 
+In future, more informative evaluation metrics in terms of F1-score and AUC will be provided for better reflection of performance of each system. We plan to also analyze the per class performance. We expect classes with less samples to be less accurate during classification because of data sparsity, which could be solved by discarding the classes with low sample counts thereby increasing the overall accuracy of the system. 
+
+In future, we would like to apply the concept to other databases and pose the concept to solve inter-database learning. We could also prove the concept in other areas like speech, image and other signal processing domains.
 
 \bibliography{reference} 
 \bibliographystyle{ieeetr}
@@ -296,10 +302,30 @@ Moreover, the training behavior of them are presented in Fig.\ref{training_loss_
 \item
   \textbf{Quiangui:} Hyper-parameter tuning; \textbf{Report Writing} - Results, Abstract, Introduction.
 \item
-  \textbf{Prashanth:} \textbf{Coding} - Data pre-processing, Data partitioning,  Feature representation for embedding layer, Baseline system; \textbf{Report Writing} - Data pre-processing and features, Embedding Layer, Baseline System, Hyper-parameter tuning.
+  \textbf{Prashanth:} \textbf{Coding} - Data pre-processing, Data partitioning,  Feature representation for embedding layer, Baseline system; \textbf{Report Writing} - Data pre-processing and features, Embedding Layer, Baseline System, Hyper-parameter tuning, Evaluation, Discussion.
 \item
   \textbf{Sebastian:} \textbf{Coding} - Neural Network training, Makefiles; \textbf{Report Writing} - Abstract, Introduction, Proposed System, Discussion.
 \end{itemize}
 \section{Word Count}
+\begin{itemize}
+\item
+109 Abstract
+\item
+392 Introduction
+\item
+254 Materials
+\item
+593 Procedure
+\item
+126 Evaluation
+\item
+60 Results: Baseline System
+\item
+92 Results: Modular LSTM network
+\item
+146 Discussion
+\item
+1772 Total
+\end{itemize}
 %\end{multicols}
 \end{document}
