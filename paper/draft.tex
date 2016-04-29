@@ -38,7 +38,7 @@
 %need for retraining. To verify our ideas, we apply our ideas to the task of
 %text-classification.
 
-In this short paper, we propose a Modular Deep Encoder-Decoder network (MDED) for text classification. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data by adding a new encoder to the network. MDED has been applied to text classification on SaudiNewsNet. A modular Long Short Term Memory (LSTM) network is built. Experimental results show that our algorithm can efficiently combine new source of data and pre-trained model. (show some summaries of experimental results here)
+In this short paper, we propose a Modular Deep Encoder-Decoder network (MDED) for text classification. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data modality by adding a new encoder to the network. MDED has been applied to text classification on SaudiNewsNet. A modular Long Short Term Memory (LSTM) network is built. Experimental results show that our algorithm can efficiently combine new source of data and pre-trained model. (show some summaries of experimental results here)
 
 \end{abstract}
 
@@ -52,10 +52,7 @@ In this short paper, we propose a Modular Deep Encoder-Decoder network (MDED) fo
 %one. This combined embedding will then be used for the classification
 %task.
 
-In the past decade, deep learning has been successfully applied to natural language processing (NLP). It has been shown that end-to-end trained deep learning algorithms can outperform traditional algorithms on various NLP tasks.
-
-
-However, the training process of deep learning algorithms is usually very time-consuming. And it is inefficient to update a model and re-train it from scratch everytime there is a new data source coming. To alleviate this problem, a novel Modular Deep Encoder-Decoder network (MDED) is proposed in this paper. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data by adding a new encoder to the network. 
+In the past decade, deep learning has gained a lot of momentum in various fields. It has been successfully applied to natural language processing (NLP). End-to-end trained deep learning algorithms have been proven to outperform traditional algorithms on various NLP tasks. The success of deep learning is accounted for trading off computationally complexity for performance. The high complexity demand for training deep learning algorithms is inefficient especially when there is new complementary data modality to be used to update a model and re-train it from scratch every time. To alleviate this problem, a novel Modular Deep Encoder-Decoder network (MDED) is proposed in this paper. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data modality by adding a new encoder to the network. 
 
 
 More formally, we want to jointly learn a set of \emph{encoder}
@@ -95,11 +92,13 @@ obtain a better initialization of the parameters of their model. Our
 approach instead is much closer in spirit to the work of Sutskever
 \cite{sutskever2014sequence} and Vinyals \cite{vinyals2015grammar}. They
 both use encoders on a sequence of data to generate a
-\emph{thought-vector} which will then be decoded in the desired terget
+\emph{thought-vector} which will then be decoded in the desired target
 sequence. In some sense, our proposal adds the transfer learning
 component to their contribution. This approach is also similar to the
 work of Karpathy \& al \cite{karpathy2014deep} where they mapped
 images to their captions with embeddings.
+
+In this paper, we evaluate the effectiveness of idea by applying the concept towards a simple NLP classification task. We adopt an Arabic newspaper article database to classify into different journals based on the article content, author and title.
 
 \section{Method}\label{method}
 \subsection{Materials}
@@ -219,7 +218,7 @@ Moreover, the training behavior of these three models are presented in Fig.\ref{
 
 \subsection{Modular LSTM network}
 
-In oder to further improve the classification performance, new sources of training data are added to the base single LSTM network. For each single LSTM network, two other data source are added to it, respectively. For example, for content LSTM network, author of the articles and title of the articles are added to it as an additional source of training data. Technically, a new encoder is added to the original LSTM network. Performance of these modular LSTM networks are reported in Table.\ref{modular_lstm_acc}.
+In order to further improve the classification performance, new sources of training data are added to the base single LSTM network. For each single LSTM network, two other data source are added to it, respectively. For example, for content LSTM network, author of the articles and title of the articles are added to it as an additional source of training data. Technically, a new encoder is added to the original LSTM network. Performance of these modular LSTM networks are reported in Table.\ref{modular_lstm_acc}.
 
 \begin{table}[!t]
 \begin{center}
@@ -232,8 +231,8 @@ Base source & \multicolumn{2}{c}{Title} & \multicolumn{2}{c}{Content} & \multico
 \hline
 New source   &   Content   &   Author     &       Title  & Author                &            Content & Title \\
 \hline
-Training acc   &                   &                  &                &                           &                           & \\
-Tesging acc   &                   &                  &                &                           &                           & \\
+Training accuracy   &                   &                  &                &                           &                           & \\
+Testing accuracy   &                   &                  &                &                           &                           & \\
 
 \hline
 
