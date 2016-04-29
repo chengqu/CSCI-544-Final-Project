@@ -1,34 +1,30 @@
-
-\author{Group 40: Arnold, Gurunat, Huang, \& Qu}
 \title{Modular Deep Encoder-Decoders}
-\date{\today}
+\author{Sebastian Arnold\Mark{1}, Prashanth Gurunath Shivakumar\Mark{2}, Cheng Qu\Mark{3}\\ and Qiangui Huang\Mark{4}}
+%\affil[1]{Department of Computer Science, University of Southern California, Los Angeles, CA \authorcr Email: {\tt \{arnolds, chengqu, qianguih\}@usc.edu}\vspace{1.5ex}}
+%\affil[2]{Ming Hsieh Department of Electrical Engineering, University of Southern California, Los Angeles, CA \authorcr Email: {\tt pgurunat@usc.edu} \vspace{-2ex}} 
+
 \documentclass[12pt]{article}
 \usepackage{amsfonts}
 \input{\string./core}
 
+\newcommand\Mark[1]{\textsuperscript#1}
+
 % Custom Title
-
-%\def\maketitle{
-    %\centering
-    %\par\textbf{\LARGE\@title}
-    %\par\hfill
-    %\par{\@author, \@date}
-    %\par\hfill
-    %\par\hfill
-    %\rule{\textwidth}{3pt}
-%}
-
 \def\maketitle{
-    \begin{centering}
-    \par\rule{\textwidth}{2pt}
-    \par\hfill
-    \par\textbf{\LARGE\@title}
-    \par\hfill
-    \par{\textit{\@author}}
-    \par\hfill
-    \par{\@date}
-    \par\rule{\textwidth}{2pt}
-    \end{centering}
+	\par\rule{\textwidth}{2pt}
+	\par\hfill
+	\begin{centering}
+	\begingroup
+	\centering
+	{\par\textbf{\LARGE\@title}\\[1.5em]
+	\large\par{\textit{\@author}}}\\[1em]
+	\begin{tabular}{*{4}{>{\centering}p{.23\textwidth}}}
+	\url{arnolds@usc.edu}\Mark{1} & \url{pgurunat@usc.edu}\Mark{2} & \url{chengqu@usc.edu}\Mark{3} & \url{qianguih@usc.edu}\Mark{4} \tabularnewline
+	9013085897 & 2251924199 & 9532576000 & 2385279985
+	\end{tabular}\par
+	\endgroup
+	\par\rule{\textwidth}{2pt}
+	\end{centering}
 }
 
 \begin{document}
@@ -117,10 +113,8 @@ a total of 31,030 Arabic newspaper articles, with a total number of 8,758,976 wo
 \caption{Figure shows article-newspaper distribution}
 \end{figure}
 
-Article objects are reprensented in json format, with UTF-8 encoding. We wrote a script to download the data from
-github repo, unzip each file, and read them in as json objects. Each json object 
-contains the flollowing fields:
-source: A string identified of the newspaper from which the article was extracted. It can have one of the following values:
+Article objects are represented in json format, with UTF-8 encoding. We wrote a script to download the data from github repo, unzip each file, and read them in as json objects. Each json object contains the following fields:
+
 \begin{itemize}
 \item source: A string identifier of the newspaper from which the article was extracted.
 \item url: The full URL from which the article was extracted.
@@ -129,6 +123,20 @@ source: A string identified of the newspaper from which the article was extracte
 \item author: The author of the article.
 \item content: The content of the article.
 \end{itemize}
+
+The dataset is partitioned into training, development and testing subsets. 80\% of the data is assigned for training and 10\% for development and testing. The development set is utilized for hyper-parameter tuning and the results are finally presented on the testing set. During partitioning, care is taken to ensure appropriate percentage of data is seen in all the classes. Figure~\ref{fig:dist} shows the distribution of data used for training and testing in each class. Figure~\ref{fig:sent_dist} shows the distribution of sentence lengths of the content of the articles.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{figures/test_class_distribution.png}
+\caption{Distribution of data for training and testing}\label{fig:dist}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth,height=6cm]{figures/sentence_length.png}
+\caption{Distribution of data for training and testing}\label{fig:sent_dist}
+\end{figure}
 
 \subsection{Procedure}\label{procedure}
 
@@ -143,17 +151,17 @@ An embedding layer is used to compute a word embedding $W: words \mapsto \mathbb
 
 We tried two approaches when building the vector embedding from multiple modalities. The first one was to vertically stack the different embeddings from the different encoders and learn the actual embedding from a linear combination from this higher dimensional vector. This led to poor results and we instead decided to experiment with both the summing over every embedding, as well as taking their mean in each dimension.
 
-\subsubsection{Discriminative Model}
+%\subsubsection{Discriminative Model}
 
-%\subsubsection{Baseline System}
+\subsubsection{Baseline System}
 We construct two baseline systems, one to classify the journals based on the
 content of the articles and the second on their authors. Identical architectures are used for both the baseline
-systems. The baseline system is a recurrent neural network with one hidden Long
-Short Term Memory (LSTM) layer succeeding the embedding layer. The dimension of
-both the embedding layer and the LSTM was fixed to 128. The output layer is a
-softmax layer with 14 outputs, one per class. The model minimize a cross-entropy loss using adaptive gradient descent. \cite{duchi2011adaptive}
+systems. The baseline system is a recurrent neural network with one hidden Long Short Term Memory (LSTM) layer succeeding the embedding layer. The dimension of both the embedding layer and the LSTM was fixed to 128. The output layer is a softmax layer with 14 outputs, one per class. The model minimize a cross-entropy loss using adaptive gradient descent. \cite{duchi2011adaptive}
 
-%\subsubsection{Proposed System}
+\subsubsection{Proposed System}
+The training for evaluation is performed as follows. We begin by training a single encoder and the decoder on a single modality.
+(eg, the content of the articles) We measure the obtained accuracy on the test set and serialize the model's parameters on disk. In the second step, we recreate the previously trained encoder and decoder, and initialize them with their respective serialized parameters. We also instantiate a new encoder architecturally identical to the first one but with untrained parameters. Finally, we load both the previous and the new modality from the dataset and their corresponding labels, before proceeding to the training steps as described in the previous sections.
+
 %The procedure is quite straight-forward. While part of the team worked on
 %building our tailored dataset, the other half worked on the model definition
 %and training procedure.
@@ -172,15 +180,9 @@ softmax layer with 14 outputs, one per class. The model minimize a cross-entropy
 \subsection{Evaluation}
 The evaluation procedure for all experiments is based on the classification accuracy of each statistical model on a held-out validation set.
 
-Before any learning happens, we begin by partitioning the dataset in two subsets: training and test. This split is achieved by first loading the entire dataset in memory and assigning the first 80\% examples to the validation set and the remaining 20\% to the test set. Doing so, we increase our confidence in the resulting accuracy. In preliminary experiments we observed that the majority of the models were highly overfitting the training set. In order to find better hyperparameters, we thus further partitioned the training set into a development and a validation set. (again an 80-20 split) Once the recall-variance trade-off reached a satisfactory level on the development and validation set, we train all models using the same hyperparameters on the entire (identical) training set, and evaluate them on the test set.
-
-The training for evaluation is performed as follows. We begin by training a single encoder and the decoder on a single modality.
-(eg, the content of the articles) We measure the obtained accuracy on the test set and serialize the model's parameters on disk. In the second step, we recreate the previously trained encoder and decoder, and initialize them with their respective serialized parameters. We also instantiate a new encoder architecturally identical to the first one but with untrained parameters. Finally, we load both the previous and the new modality from the dataset and their corresponding labels, before proceeding to the training steps as described in the previous sections.
-
 \section{Results}\label{results}
 
-\subsection{Single LSTM network}
-
+\subsection{Baseline System}
 
 First, three single LSTM networks are trained for text classification, where title, author and content values are used for training data, respectively. The classification performance of them are reported in Table.\ref{single_lstm_acc}. From Table.\ref{single_lstm_acc} we can see that xxx model has the best classification performance among these three models.
 
