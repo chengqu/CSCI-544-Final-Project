@@ -5,6 +5,7 @@
 
 \documentclass[12pt]{article}
 \usepackage{amsfonts}
+\usepackage{subcaption}
 \input{\string./core}
 
 \newcommand\Mark[1]{\textsuperscript#1}
@@ -20,7 +21,7 @@
 	\large\par{\textit{\@author}}}\\[1em]
 	\begin{tabular}{*{4}{>{\centering}p{.23\textwidth}}}
 	\url{arnolds@usc.edu}\Mark{1} & \url{pgurunat@usc.edu}\Mark{2} & \url{chengqu@usc.edu}\Mark{3} & \url{qianguih@usc.edu}\Mark{4} \tabularnewline
-	9013085897 & 2251924199 & 9532576000 & 2385279985
+	9013085897 & 2251924199 & 2385279985 & 9532576000
 	\end{tabular}\par
 	\endgroup
 	\par\rule{\textwidth}{2pt}
@@ -38,7 +39,7 @@
 %need for retraining. To verify our ideas, we apply our ideas to the task of
 %text-classification.
 
-In this short paper, we propose a Modular Deep Encoder-Decoder network (MDED) for text classification. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data modality by adding a new encoder to the network. MDED has been applied to text classification on Saudi Newspapers Arabic Corpus (SaudiNewsNet). A modular Long Short Term Memory (LSTM) network is built. Experimental results show that our algorithm can efficiently combine new source of data and pre-trained model. (show some summaries of experimental results here)
+In this short paper, we propose a Modular Deep Encoder-Decoder network (MDED) for text classification. The basic idea behind MDED is to extend a pre-trained model, which consists of a set of deep encoder-decoders, with an additional source of data modality by adding a new encoder to the network. MDED has been applied to text classification on Saudi Newspapers Arabic Corpus (SaudiNewsNet). A modular Long Short Term Memory (LSTM) network is built. Experimental results show that our algorithm can efficiently combine new source of data and pre-trained model. The training process can converge into a local optimum in very few epochs when a new data source is added. With a good initial encoder-decoder, the modular LSTM networks can improve classification accuracy by up to 0.51\% when a new data source is added.
 
 \end{abstract}
 
@@ -171,7 +172,9 @@ The training for evaluation is performed as follows. We begin by training a sing
 (eg, the content of the articles) We measure the obtained accuracy on the test set and serialize the model's parameters on disk. In the second step, we recreate the previously trained encoder and decoder, and initialize them with their respective serialized parameters. We also instantiate a new encoder architecturally identical to the first one but with untrained parameters. Finally, we load both the previous and the new modality from the dataset and their corresponding labels, before proceeding to the training steps as described in the previous sections.
 
 \subsubsection{Hyper-parameter Tuning}
-Using the development set, the hyper-parameters were fine-tuned for better performance. The tuning of sentence length cut-off for training the embedding layer was found to be critical especially when training on the content of articles. Setting lower sentence length resulted in over-training of the system. The distribution of the sentence lengths were plotted as shown in Figure~\ref{fig:sent_dist}. Looking at the distribution, we found the value of 2048 to be optimal. Different values for learning rate, hidden-layer dimensionality and non-linearity were experimented. 
+Using the development set, the hyper-parameters were fine-tuned for better performance. The tuning of sentence length cut-off for training the embedding layer was found to be critical especially when training on the content of articles. Setting lower sentence length resulted in over-training of the system. The distribution of the sentence lengths were plotted as shown in Figure~\ref{fig:sent_dist}. Looking at the distribution, we found the value of 2048 to be optimal. Different values for learning rate, hidden-layer dimensionality and non-linearity were experimented. Through a series of experiments, we found the optimal setting for initial learning rate is 0.01, optimal hidden-layer dimensionality is 128, and tangent function is the optimal activation function in hidden layers.
+
+
 %The procedure is quite straight-forward. While part of the team worked on
 %building our tailored dataset, the other half worked on the model definition
 %and training procedure.
@@ -195,7 +198,9 @@ The evaluation procedure for all experiments is based on the classification accu
 
 \subsection{Baseline System}
 
-First, three single LSTM networks are trained for text classification, where title, author and content values are used for training data, respectively. The classification performance of them are reported in Table.\ref{single_lstm_acc}. From Table.\ref{single_lstm_acc} we can see that xxx model has the best classification performance among these three models.
+First, three single LSTM networks are trained for text classification, where title, author and content values are used for training data, respectively. The hyper-parameter setting is same as introduced in above section. The batchsize is 32 and training ends after 10 epochs.
+
+The classification performance of these models are reported in Table.\ref{single_lstm_acc}. From Table.\ref{single_lstm_acc} we can see that author model has the best classification performance (73.89\%)  among these three models. And title model has the worst performance (21.23\%) although its training accuracy achieves 92.93\%, which means training using only the title of articles will result in serious overfitting.
 
 \begin{table}[!t]
 \begin{center}
@@ -203,12 +208,12 @@ First, three single LSTM networks are trained for text classification, where tit
 \label{single_lstm_acc}
 \begin{tabular}{c|c|c|c}
 \hline
-Training data & Title & Author & Content\\
+Training data & Title & Content & Author\\
 \hline
 
-Training accuracy &  & 83.5207\% & 88.8635\% \\
+Training accuracy (\%) & 92.93  & 96.31 & 85.41\\
 
-Testing accuracy & & 79.7421 \% & 58.7276\% \\
+Testing accuracy (\%) & 21.23  & 43.68 & \textbf{73.89} \\
 
 \hline
 \end{tabular}
@@ -220,7 +225,7 @@ Moreover, the training behavior of these three models are presented in Fig.\ref{
 
 \begin{figure}[!t]
 \begin{center}
-%\includegraphics[width=2.8in]{path_sample.eps}
+\includegraphics[width=5in]{figures/loss_training_single.png}
 \end{center}
 \caption{Training loss and testing loss of single LSTM networks.}
 \label{training_loss_single}
@@ -230,7 +235,10 @@ Moreover, the training behavior of these three models are presented in Fig.\ref{
 
 \subsection{Modular LSTM network}
 
-In order to further improve the classification performance, new sources of training data are added to the base single LSTM network. For each single LSTM network, two other data source are added to it, respectively. For example, for content LSTM network, author of the articles and title of the articles are added to it as an additional source of training data. Technically, a new encoder is added to the original LSTM network. Performance of these modular LSTM networks are reported in Table.\ref{modular_lstm_acc}.
+In order to further improve the classification performance, new sources of training data are added to the base single LSTM network. For each single LSTM network, one new data source is added to it, respectively. For example, for content LSTM network, author of the articles and title of the articles are added to it as an additional source of training data. Technically, a new encoder is added to the original LSTM network. The training parameters are same as above. Performance of these modular LSTM networks are reported in Table.\ref{modular_lstm_acc}.
+
+Experimental results show that our modular LSTM networks can effectively exploit new data source in most of the cases. For the author model, which is trained using only author of articles, the classification accuracy has been improved by 0.57\%. One interesting finding is that after adding a new data source to content model, the classification is decreased by 0.34\% and 1.31\%. We can also find that the content-author model \footnote{author is the based data source and content is the added data source} has a much better performance than author-content model. That's because the single author model has a better performance than the single content model, which demonstrates that a good initial model is very crucial in modular LSTM networks.
+
 
 \begin{table}[!t]
 \begin{center}
@@ -243,8 +251,10 @@ Base source & \multicolumn{2}{c}{Title} & \multicolumn{2}{c}{Content} & \multico
 \hline
 New source   &   Content   &   Author     &       Title  & Author                &            Content & Title \\
 \hline
-Training accuracy   &                   &                  &                &                           &                           & \\
-Testing accuracy   &                   &                  &                &                           &                           & \\
+Training accuracy (\%)   & 95.59  &   95.51    &   97.12   &   97.13    &  86.48  & 85.79\\
+Testing accuracy (\%)   &  21.69  &     21.64   &   42.37  &    43.34   &  \textbf{74.46}    & 74.04\\
+\hline
+Improvement (\%) &           0.46 &     0.41     &      -1.31    &    -0.34  &   \textbf{0.57}   & 0.15 \\
 
 \hline
 
@@ -255,17 +265,41 @@ Testing accuracy   &                   &                  &                &    
 \end{table}
 
 
-
-Moreover, the training behavior of them are presented in Fig.\ref{training_loss_modular}.
-
-
 \begin{figure}[!t]
-\begin{center}
-%\includegraphics[width=2.8in]{path_sample.eps}
-\end{center}
-\caption{Training loss and testing loss of modular LSTM networks.}
-\label{training_loss_modular}
+\begin{subfigure}{1\textwidth}
+  \centering
+   \includegraphics[width=4in]{figures/loss_training_title_modular.png}
+   \caption{}
+   \label{modular_loss_title}
+\end{subfigure}
+
+\begin{subfigure}{1\textwidth}
+  \centering
+   \includegraphics[width=4in]{figures/loss_training_content_modular.png}
+   \caption{}
+   \label{modular_loss_title}
+\end{subfigure}
+
+\begin{subfigure}{1\textwidth}
+  \centering
+   \includegraphics[width=4in]{figures/loss_training_author_modular.png}
+   \caption{}
+   \label{modular_loss_title}
+\end{subfigure}
+
+\caption{Training loss and testing loss of modular LSTM networks: (a) title model based modular LSTM; (b) content model based modular LSTM; (c) author based modular LSTM. In the legends content-title author-title, and etc., the previous one denotes base data source and latter one denotes added data source.}
+\label{modular_loss}
 \end{figure}
+   
+   
+
+Moreover, the training behavior of them are presented in Fig.\ref{modular_loss}. In Fig.\ref{modular_loss}, the  training loss of initial single LSTM and modular LSTm networks are compared with each other. From Fig.\ref{modular_loss} we can see that, in all three cases, after a new data source is added, the training loss can converge to a local optimal very fast and the loss values accordingly decrease rapidly. Once a new data source is added, the whole training process can finish in less than 1,000 iterations (near 2 epochs). This demonstrates the efficiency of our MDED network.
+
+
+
+
+
+
 
 
 
@@ -300,7 +334,7 @@ In future, we would like to apply the concept to other databases and pose the co
 \item
   \textbf{Cheng:} \textbf{Coding} - Data retrieval, unzipping, reading, unicode decoding; \textbf{Report Writing} - Corpora, Evaluation.
 \item
-  \textbf{Quiangui:} Hyper-parameter tuning; \textbf{Report Writing} - Results, Abstract, Introduction.
+  \textbf{Quiangui:} \textbf{Coding} - Core model and augmented model training, Data partitioning, Word2vec model, Training log parsing, Hyper-parameter tuning, Model training, Makefiles. \textbf{Report Writing} - Abstract, Introduction, Hyper-parameter tuning, Results.
 \item
   \textbf{Prashanth:} \textbf{Coding} - Data pre-processing, Data partitioning,  Feature representation for embedding layer, Baseline system; \textbf{Report Writing} - Data pre-processing and features, Embedding Layer, Baseline System, Hyper-parameter tuning, Evaluation, Discussion.
 \item
