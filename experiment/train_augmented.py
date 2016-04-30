@@ -45,24 +45,35 @@ class MultiModalModel(Model):
 if __name__ == '__main__':
     # parse the command line arguments
     parser = NeonArgparser(__doc__)
+    parser.add_argument("-nds","--new_data_source", help = "choose the data source used for classification. options: content, title, author, author-content, author-title, content-title. defaul: title")
+    parser.add_argument("-im","--initial_model", help = "choose the initial encoder-decoder model. options: content, title, author. default: content")
+    
+
     args = parser.parse_args(gen_be=False)
 
     # hyperparameters from the reference
     args.batch_size = 32
     args.backend = 'gpu'
-    modal1 = 'content'
-    modal2 = 'authors'
+   
 
+    if not args.new_data_source:
+      args.new_data_source = 'title'
+
+    if not args.initial_model:
+      args.initial_model = 'content'
+     
+
+ 
+    print ' '
+    print "new source used for classification is: ", args.new_data_source
+    print "initial model is trained on: ", args.initial_model
+    print ' '
+    
+    
     # Setup backend
     be = gen_backend(**extract_valid_args(args, gen_backend))
 
     # Load the dataset
-<<<<<<< Updated upstream
-    (X_train_content, y_train_content), (X_test_content, y_test_content), nout, vocab_size = get_saudinet_data(args, modality=modal1)
-    (X_train_title, y_train_title), (X_test_title, y_test_title), nout, vocab_size = get_saudinet_data(args, modality=modal2)
-    train_set = ArrayIterator([X_train_content, X_train_title], y_train_content, nout)
-    test_set = ArrayIterator([X_test_content, X_test_title], y_test_content, nout)
-=======
     (X_train_content, y_train_content), (X_test_content, y_test_content), nout, vocab_size = get_saudinet_data(args, modality='content')
     (X_train_title, y_train_title), (X_test_title, y_test_title), nout, vocab_size = get_saudinet_data(args, modality='title')
     (X_train_authors, y_train_authors), (X_test_authors, y_test_authors), nout, vocab_size = get_saudinet_data(args, modality='author')
@@ -84,10 +95,10 @@ if __name__ == '__main__':
 
     X_train['author-content-title'], X_test['author-content-title'] = [X_train_authors, X_train_content,X_train_title], [X_test_authors, X_test_content,X_test_title]
 
-    Y_train, Y_test = {}, {}
-    Y_train['content'], Y_test['content'] = y_train_content, y_test_content
-    Y_train['author'], Y_test['author'] = y_train_authors, y_test_authors
-    Y_train['title'], Y_test['title'] = y_train_title, y_test_title
+    #Y_train, Y_test = {}, {}
+    #Y_train['content'], Y_test['content'] = y_train_content, y_test_content
+    #Y_train['author'], Y_test['author'] = y_train_authors, y_test_authors
+    #Y_train['title'], Y_test['title'] = y_train_title, y_test_title
 
 
 
@@ -95,18 +106,20 @@ if __name__ == '__main__':
     
     data_source_keyword = args.initial_model + '-' + args.new_data_source
     
-    
-    train_set = ArrayIterator( X_train[data_source_keyword], Y_train[args.initial_model], nout)
-    test_set = ArrayIterator(  X_test[data_source_keyword],  Y_test[args.initial_model],  nout)
+    train_set = ArrayIterator( X_train[data_source_keyword], y_train_content, nout)
+    test_set = ArrayIterator(  X_test[data_source_keyword], y_test_content, nout)
+
+ 
+    #train_set = ArrayIterator( X_train[data_source_keyword], Y_train[args.initial_model], nout)
+    #test_set = ArrayIterator(  X_test[data_source_keyword],  Y_test[args.initial_model],  nout)
     
     
     
     #train_set = ArrayIterator([X_train_content, X_train_title], y_train_content, nout)
     #test_set = ArrayIterator([X_test_content, X_test_title], y_test_content, nout)
->>>>>>> Stashed changes
 
     # Build the network
-    file_prefix = './saved_models/' + modal1
+    file_prefix = './saved_models/' + args.initial_model
     encoder, decoder = load_core(file_prefix)
     encoder = Sequential(encoder)
     augmentor, cost, opt = get_title_augmentor(vocab_size=vocab_size)
@@ -117,7 +130,8 @@ if __name__ == '__main__':
         decoder
     ])
 
-    callbacks = Callbacks(model, **args.callback_args)
+    #callbacks = Callbacks(model, **args.callback_args)
+    callbacks = Callbacks(model, eval_set=test_set, **args.callback_args)
 
     # Train the model on the dataset
     model.fit(
@@ -130,4 +144,5 @@ if __name__ == '__main__':
     # Benchmark
     print 'Train accuracy: ', model.eval(train_set, metric=Accuracy())
     print 'Test accuracy: ', model.eval(test_set, metric=Accuracy())
+
 

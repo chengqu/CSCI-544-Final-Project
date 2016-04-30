@@ -52,7 +52,7 @@ def get_core_net(embedding_size=128, vocab_size=20000, nout=10, dropout_rate = 0
     if activation_function == 4:
         af = Normalizer()
 
-
+    
     embedding_dim = embedding_size
     uni = Uniform(low=-0.1/embedding_dim, high=0.1/embedding_dim)
     glorot = GlorotUniform()
@@ -64,7 +64,6 @@ def get_core_net(embedding_size=128, vocab_size=20000, nout=10, dropout_rate = 0
     ]
 
     dec = [
-        Dropout(keep=0.25),
         Dropout(keep=dropout_rate),
         Affine(nout, glorot, bias=glorot, activation=Softmax())
     ]
@@ -73,7 +72,7 @@ def get_core_net(embedding_size=128, vocab_size=20000, nout=10, dropout_rate = 0
     return (enc, dec), cost, opt
 
 
-def load_core(file_prefix, embedding_size=128):
+def load_core(file_prefix,embedding_size=128):
     enc = Model(file_prefix + '_encoder.neon').layers.layers
     dec = Model(file_prefix + '_decoder.neon').layers.layers
     return enc, dec
@@ -102,3 +101,4 @@ def get_title_augmentor(vocab_size=20000, embedding_size=128, path=None):
     ]
     cost, opt = get_cost_opt()
     return aug, cost, opt
+

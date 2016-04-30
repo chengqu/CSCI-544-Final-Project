@@ -99,10 +99,8 @@ ntrain, nvalid, nclass, vocab_size = data.attrs['ntrain'], data.attrs['nvalid'],
 # X_valid, y_valid = get_paddedXY(X, y, vocab_size=vocab_size, sentence_length=sentence_length)
 # valid_set = ArrayIterator(X_valid, y_valid, nclass=nclass)
 
-#train_set, valid_set, nout = get_saudinet_data(args)
-(X_train, y_train), (X_test, y_test), nout, vocab_size = get_saudinet_data(args, modality='content')
-train_set = ArrayIterator(X_train, y_train, nout)
-test_set = ArrayIterator(X_test, y_test, nout)
+train_set, valid_set, nout = get_saudinet_data(args)
+
 
 # initialization
 init_glorot = GlorotUniform()
