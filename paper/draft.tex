@@ -1,5 +1,5 @@
 \title{Modular Deep Encoder-Decoders}
-\author{Sebastian Arnold\Mark{1}, Prashanth Gurunath Shivakumar\Mark{2}, Cheng Qu\Mark{3}\\ and Qiangui Huang\Mark{4}}
+\author{Sebastien Arnold\Mark{1}, Prashanth Gurunath Shivakumar\Mark{2}, Cheng Qu\Mark{3}\\ and Qiangui Huang\Mark{4}}
 %\affil[1]{Department of Computer Science, University of Southern California, Los Angeles, CA \authorcr Email: {\tt \{arnolds, chengqu, qianguih\}@usc.edu}\vspace{1.5ex}}
 %\affil[2]{Ming Hsieh Department of Electrical Engineering, University of Southern California, Los Angeles, CA \authorcr Email: {\tt pgurunat@usc.edu} \vspace{-2ex}} 
 
@@ -79,19 +79,19 @@ without retraining our trained decoders and encoders.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics{figures/multimodal.png}
+\includegraphics[width=0.5\textwidth]{figures/multimodal.png}
 \caption{Multi-modal Transfer Learning}
 \end{figure}
 
 Although we could have used any kind of mapping, we chose to use deep
 learning algorithms, as they easily learn hierarchical representations
 and have been known to highly outperform other statistical techniques on
-natural language tasks. Learning embeddings has been previously done by
+natural language tasks. Learning embeddings has been previously done by Zhuang \& al in 
 \cite{zhuang2015supervised}, although our proposed contribution is
-slightly different. \cite{zhuang2015supervised} used deep autoencoders to
+slightly different. They used deep autoencoders to
 obtain a better initialization of the parameters of their model. Our
-approach instead is much closer in spirit to the work of Sutskever
-\cite{sutskever2014sequence} and Vinyals \cite{vinyals2015grammar}. They
+approach instead is much closer in spirit to the work of Sutskever \& al
+\cite{sutskever2014sequence} and Vinyals \& al \cite{vinyals2015grammar}. They
 both use encoders on a sequence of data to generate a
 \emph{thought-vector} which will then be decoded in the desired target
 sequence. In some sense, our proposal adds the transfer learning
@@ -108,7 +108,7 @@ We use the freely available Saudi Newspapers Arabic Corpus \cite{hagrima2015}. T
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth]{figures/article-newspaper_distribution.png}
+\includegraphics[width=0.65\textwidth]{figures/article-newspaper_distribution.png}
 \caption{Figure shows article-newspaper distribution}
 \end{figure}
 
@@ -134,18 +134,18 @@ The dataset is partitioned into training, development and testing subsets. 80\% 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth]{figures/test_class_distribution.png}
+\includegraphics[width=0.65\textwidth]{figures/test_class_distribution.png}
 \caption{Distribution of data for training and testing}\label{fig:dist}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth,height=6cm]{figures/sentence_length.png}
+\includegraphics[width=0.65\textwidth,height=6cm]{figures/sentence_length.png}
 \caption{Distribution of data for training and testing}\label{fig:sent_dist}
 \end{figure}
 
 \subsubsection{Tools}
-For training the neural networks, Neon toolkit was employed \cite{Neon}. Neon is Nervana's python based deep-learning library. The toolkit was chosen because of its flexibility of distributed training on both CPU and GPU and its good support for neural network components. 
+For training the neural networks, the neon toolkit was employed \cite{Neon}. Neon is Nervana's python based deep-learning library. The toolkit was chosen because of its flexibility of training on both CPU and GPU, its good support for neural network components, and it's state-of-the-art performance on GPU. In addition, one of the team members is a core contrubtor to the framework.
 
 \subsection{Procedure}\label{procedure}
 
@@ -158,18 +158,19 @@ After building the vocabulary for the corpora, the original sentences of the cor
 \subsubsection{Embedding Layer}
 An embedding layer is used to compute a word embedding $W: words \mapsto \mathbb{R}^{n}$ which is a function mapping words of a language to a high dimensional vectors which are continuous, distributed representation of the vocabulary words with good semantic properties. The hope of such a representation is to project similar words to similar regions in the hyper-space from a semantic point of view. 
 
-We tried two approaches when building the vector embedding from multiple modalities. The first one was to vertically stack the different embeddings from the different encoders and learn the actual embedding from a linear combination from this higher dimensional vector. This led to poor results and we instead decided to experiment with both the summing over every embedding, as well as taking their mean in each dimension.
-
 %\subsubsection{Discriminative Model}
 
 \subsubsection{Baseline System}
 We construct two baseline systems, one to classify the journals based on the
 content of the articles and the second on their authors. Identical architectures are used for both the baseline
-systems. The baseline system is a recurrent neural network with one hidden Long Short Term Memory (LSTM) layer succeeding the embedding layer. The dimension of both the embedding layer and the LSTM was fixed to 128. The output layer is a softmax layer with 14 outputs, one per class. The model minimize a cross-entropy loss using adaptive gradient descent. \cite{duchi2011adaptive}
+systems. The encoder of the baseline system is a recurrent neural network with one hidden Long Short Term Memory (LSTM) layer succeeding the embedding layer. The dimension of both the embedding layer and the LSTM was fixed to 128. The decoder is a softmax layer with 14 outputs, one per class. The model minimize a cross-entropy loss using adaptive gradient descent \cite{duchi2011adaptive}. 
 
 \subsubsection{Proposed System}
-The training for evaluation is performed as follows. We begin by training a single encoder and the decoder on a single modality.
-(eg, the content of the articles) We measure the obtained accuracy on the test set and serialize the model's parameters on disk. In the second step, we recreate the previously trained encoder and decoder, and initialize them with their respective serialized parameters. We also instantiate a new encoder architecturally identical to the first one but with untrained parameters. Finally, we load both the previous and the new modality from the dataset and their corresponding labels, before proceeding to the training steps as described in the previous sections.
+Once the baseline encoder and decoder have been trained on a single modality, we serialize their parameters on disk. We then proceed to the augmentation of our model by adding a new encoder. We first jointly load both modalities from the dataset - in our case the authors and the content of the articles - as well as their targets. We then instanciate two encoders and one decoder with random initialization. The parameters of the decoder and of one of the encoder are set from the serialized values obtained from the baseline. We then proceed by training our augmented model on both modalities. To ensure that the parameters of the initial encoder are not changed, we manually set the scaling factor of the gradients to zero. This results in the backpropagated errors - the partial derivatives of the errors with respect to the inputs - to be zero and the adaptive gradient descent step to have no effect.
+
+Both of the encoders use an identical structure independently of the modality they are trained on. This model architecture is identical to the one described in the baseline system subsection.
+
+We tried two approaches when building the vector embedding from multiple modalities. The first one was to vertically stack the different embeddings from the different encoders and learn the actual embedding as a linear combination from this higher dimensional vector. This led to poor results and we instead decided to experiment with both the summing over every embedding, as well as taking their mean in each dimension. Both approaches resulted in fairly similar results, however and we decided to use the mean of the embeddings in our experiments. The intuition behind this decision is grounded in the observation that taking the mean of several embeddings will have a less drastical effect on the decoder, thus stabilizing the learning in early stages of the transfer training.
 
 \subsubsection{Hyper-parameter Tuning}
 Using the development set, the hyper-parameters were fine-tuned for better performance. The tuning of sentence length cut-off for training the embedding layer was found to be critical especially when training on the content of articles. Setting lower sentence length resulted in over-training of the system. The distribution of the sentence lengths were plotted as shown in Figure~\ref{fig:sent_dist}. Looking at the distribution, we found the value of 2048 to be optimal. Different values for learning rate, hidden-layer dimensionality and non-linearity were experimented. Through a series of experiments, we found the optimal setting for initial learning rate is 0.01, optimal hidden-layer dimensionality is 128, and tangent function is the optimal activation function in hidden layers.
@@ -232,6 +233,31 @@ Moreover, the training behavior of these three models are presented in Fig.\ref{
 \end{figure}
 
 
+\begin{figure}[!t]
+\begin{subfigure}{1\textwidth}
+  \centering
+   \includegraphics[width=4in]{figures/loss_training_title_modular.png}
+   \caption{}
+   \label{modular_loss_title}
+\end{subfigure}
+
+\begin{subfigure}{1\textwidth}
+  \centering
+   \includegraphics[width=4in]{figures/loss_training_content_modular.png}
+   \caption{}
+   \label{modular_loss_title}
+\end{subfigure}
+
+\begin{subfigure}{1\textwidth}
+  \centering
+   \includegraphics[width=4in]{figures/loss_training_author_modular.png}
+   \caption{}
+   \label{modular_loss_title}
+\end{subfigure}
+
+\caption{Training loss and testing loss of modular LSTM networks: (a) title model based modular LSTM; (b) content model based modular LSTM; (c) author based modular LSTM. In the legends content-title author-title, and etc., the previous one denotes base data source and latter one denotes added data source.}
+\label{modular_loss}
+\end{figure}
 
 \subsection{Modular LSTM network}
 
@@ -258,72 +284,21 @@ Improvement (\%) &           0.46 &     0.41     &      -1.31    &    -0.34  &  
 
 \hline
 
-
 \hline
 \end{tabular}
 \end{center}
 \end{table}
-
-
-\begin{figure}[!t]
-\begin{subfigure}{1\textwidth}
-  \centering
-   \includegraphics[width=4in]{figures/loss_training_title_modular.png}
-   \caption{}
-   \label{modular_loss_title}
-\end{subfigure}
-
-\begin{subfigure}{1\textwidth}
-  \centering
-   \includegraphics[width=4in]{figures/loss_training_content_modular.png}
-   \caption{}
-   \label{modular_loss_title}
-\end{subfigure}
-
-\begin{subfigure}{1\textwidth}
-  \centering
-   \includegraphics[width=4in]{figures/loss_training_author_modular.png}
-   \caption{}
-   \label{modular_loss_title}
-\end{subfigure}
-
-\caption{Training loss and testing loss of modular LSTM networks: (a) title model based modular LSTM; (b) content model based modular LSTM; (c) author based modular LSTM. In the legends content-title author-title, and etc., the previous one denotes base data source and latter one denotes added data source.}
-\label{modular_loss}
-\end{figure}
-   
    
 
-Moreover, the training behavior of them are presented in Fig.\ref{modular_loss}. In Fig.\ref{modular_loss}, the  training loss of initial single LSTM and modular LSTm networks are compared with each other. From Fig.\ref{modular_loss} we can see that, in all three cases, after a new data source is added, the training loss can converge to a local optimal very fast and the loss values accordingly decrease rapidly. Once a new data source is added, the whole training process can finish in less than 1,000 iterations (near 2 epochs). This demonstrates the efficiency of our MDED network.
-
-
-
-
-
-
-
-
-
-
-
-
-%Needs results for:
-
-%1. single model on authors
-%2. single model on content
-%3. single model on titles
-%4. multimodal on authors-content
-%5. multimodal on title-content
-%6. ? multimodal author-titles ?
-
-%TODO: Say if we ended up using RecurrentSum or RecurrentMean for the embedding. (see embedding layer section)
+Moreover, the training behavior of them are presented in Fig.\ref{modular_loss}. The  training loss of initial single LSTM and modular LSTM networks are compared with each other. From Fig.\ref{modular_loss} we can see that, in all three cases, after a new data source is added the training loss can converge to a local optimal very fast and the loss values accordingly decrease rapidly. Once a new data source is added, the whole training process can finish in less than 1,000 iterations (near 2 epochs). This demonstrates the efficiency of our MDED network.
 
 
 \section{Discussion}\label{discussion}
-The results of the baseline system for each modality by themselves show significant improvement over the random baseline. We asses that the author modality to be more informative for classification as expected due to low overlap of author names across journals.
+The results of the baseline system for each modality by themselves show significant improvement over the random baseline. We asses that the author modality to be more informative for classification as expected due to low overlap of author names across journals. In addition to the improved accuracy and fast convergence of the system, further improvement in the computational time could be gained by avoiding the optimization step of the trained encoders. In fact, in this paper we only cancel the effect of adaptive gradient descent on the baseline encoder by setting the gradients to zero, but the computations are still carried out. This improvement could be included in frameworks that take advantage of MDEDs for transfer learning.
 
-In future, more informative evaluation metrics in terms of F1-score and AUC will be provided for better reflection of performance of each system. We plan to also analyze the per class performance. We expect classes with less samples to be less accurate during classification because of data sparsity, which could be solved by discarding the classes with low sample counts thereby increasing the overall accuracy of the system. 
+In future work, more informative evaluation metrics in terms of F1-score and AUC will be provided for better reflection of performance of each system. We plan to also analyze the per class performance. We expect classes with less samples to be less accurate during classification because of data sparsity, which could be solved by discarding the classes with low sample counts thereby increasing the overall accuracy of the system. 
 
-In future, we would like to apply the concept to other databases and pose the concept to solve inter-database learning. We could also prove the concept in other areas like speech, image and other signal processing domains.
+In future work, we would like to apply the concept to other databases and pose the concept to solve inter-database learning. We could also prove the concept in other areas like speech, image and other signal processing domains.
 
 \bibliography{reference} 
 \bibliographystyle{ieeetr}
@@ -338,7 +313,7 @@ In future, we would like to apply the concept to other databases and pose the co
 \item
   \textbf{Prashanth:} \textbf{Coding} - Data pre-processing, Data partitioning,  Feature representation for embedding layer, Baseline system; \textbf{Report Writing} - Data pre-processing and features, Embedding Layer, Baseline System, Hyper-parameter tuning, Evaluation, Discussion.
 \item
-  \textbf{Sebastian:} \textbf{Coding} - Neural Network training, Makefiles; \textbf{Report Writing} - Abstract, Introduction, Proposed System, Discussion.
+    \textbf{Sébastien:} \textbf{Coding} - Core and augmented model definition, experimental results; \textbf{Report Writing} - Proposal, Presentation, Abstract, Introduction, Proposed System, Discussion.
 \end{itemize}
 \section{Word Count}
 \begin{itemize}
@@ -349,7 +324,7 @@ In future, we would like to apply the concept to other databases and pose the co
 \item
 254 Materials
 \item
-593 Procedure
+757 Procedure
 \item
 126 Evaluation
 \item
@@ -357,9 +332,9 @@ In future, we would like to apply the concept to other databases and pose the co
 \item
 92 Results: Modular LSTM network
 \item
-146 Discussion
+224 Discussion
 \item
-1772 Total
+2034 Total
 \end{itemize}
 %\end{multicols}
 \end{document}
