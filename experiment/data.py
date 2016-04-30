@@ -184,7 +184,6 @@ def preprocess_data_train(data, query, path='.', filepath='labeledTrainData.tsv'
                 data_ = clean_string_unicode(data[i][key])
                 data_words = data_.strip().split()
                 num_words = len(data_words)
-                split = int(np.random.rand() < train_ratio)
 
                 # create record
                 if query == key:
